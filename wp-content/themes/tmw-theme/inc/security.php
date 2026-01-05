@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 // =============================================================================
 // BLOCK WP-ADMIN ACCESS FOR NON-ADMINS
 // =============================================================================
-// add_action('admin_init', 'tmw_block_wp_admin', 1);
+add_action('admin_init', 'tmw_block_wp_admin', 1);
 
 function tmw_block_wp_admin() {
     // Allow AJAX requests
@@ -67,7 +67,7 @@ function tmw_hide_admin_bar() {
 // =============================================================================
 // REDIRECT WP-LOGIN.PHP TO FRONTEND
 // =============================================================================
-add_action('login_init', 'tmw_redirect_wp_login');
+// add_action('login_init', 'tmw_redirect_wp_login');
 
 function tmw_redirect_wp_login() {
     // Get the action
