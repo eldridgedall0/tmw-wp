@@ -1,0 +1,14 @@
+# Ignore everything
+/*
+
+# But include these folders
+!wp-content/
+wp-content/*
+!wp-content/plugins/
+!wp-content/themes/
+
+# Exclude garage folder (has its own repo)
+garage/
+
+# Include gitignore itself
+!.gitignore
