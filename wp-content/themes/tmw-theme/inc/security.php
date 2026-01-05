@@ -46,8 +46,8 @@ function tmw_block_wp_admin() {
         $redirect = home_url('/');
     }
 
-    wp_safe_redirect($redirect);
-    exit;
+    // wp_safe_redirect($redirect);
+    // exit;
 }
 
 // =============================================================================
