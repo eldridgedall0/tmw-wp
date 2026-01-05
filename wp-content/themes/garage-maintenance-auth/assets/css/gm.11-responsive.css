@@ -1,0 +1,173 @@
+/**
+ * Garage Maintenance - Responsive rules
+ */
+/* ============================================
+   RESPONSIVE - TABLET & MOBILE
+   ============================================ */
+@media (max-width: 1400px) {
+  :root {
+    --app-max-width: 1200px;
+    --sidebar-width: 300px;
+  }
+}
+
+@media (max-width: 1200px) {
+  :root {
+    --sidebar-width: 280px;
+  }
+  
+  .dashboard-layout {
+    gap: 18px;
+  }
+}
+
+@media (max-width: 1024px) {
+  .dashboard-layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboard-sidebar {
+    position: static;
+    order: -1;
+  }
+  
+  .reminder-snippet-list {
+    max-height: 200px;
+  }
+}
+
+@media (max-width: 900px) {
+  .top-controls {
+    align-items: flex-start;
+    width: 100%;
+  }
+  
+  .nav {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .vehicle-picker {
+    align-items: flex-start;
+    width: 100%;
+  }
+  
+  .vehicle-picker-select-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .vehicle-picker select {
+    min-width: 0;
+    width: 100%;
+  }
+  
+  .vehicle-picker-odo-row {
+    width: 100%;
+  }
+  
+  .vehicle-picker-odo-input {
+    flex: 1;
+    min-width: 80px;
+  }
+}
+
+@media (max-width: 650px) {
+  body {
+    padding: 12px;
+  }
+  
+  .app {
+    padding: 16px;
+    border-radius: 18px;
+  }
+  
+  header {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .title-block h1 {
+    font-size: 1.25rem;
+  }
+  
+  .nav {
+    flex-wrap: wrap;
+  }
+  
+  .nav button {
+    flex: 1;
+    min-width: 85px;
+    justify-content: center;
+    padding: 8px 10px;
+    font-size: 0.78rem;
+  }
+  
+  .card {
+    padding: 14px;
+  }
+  
+  .field-grid,
+  .entry-body-fields,
+  .reminder-body-fields,
+  .entry-view-grid,
+  .settings-intervals-main,
+  .settings-vehicle-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  
+  .button-row {
+    flex-direction: column;
+  }
+  
+  button {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .dashboard-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  #toggle-entry-form {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .form-preference-section {
+    justify-content: center;
+  }
+  
+  .stats-row {
+    justify-content: center;
+  }
+  
+  footer {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+@media (max-width: 400px) {
+  .app {
+    padding: 12px;
+    border-radius: 14px;
+  }
+  
+  .nav button {
+    padding: 6px 8px;
+    font-size: 0.72rem;
+  }
+  
+  .pill {
+    padding: 3px 8px;
+    font-size: 0.75rem;
+  }
+  
+  .btn-small {
+    padding: 5px 10px;
+    font-size: 0.75rem;
+  }
+}
