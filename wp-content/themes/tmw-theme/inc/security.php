@@ -56,12 +56,12 @@ function tmw_block_wp_admin() {
 add_action('after_setup_theme', 'tmw_hide_admin_bar');
 
 function tmw_hide_admin_bar() {
-    if (!current_user_can('manage_options')) {
+    // if (!current_user_can('manage_options')) {
         add_filter('show_admin_bar', '__return_false');
         
         // Also remove the admin bar CSS
         remove_action('wp_head', '_admin_bar_bump_cb');
-    }
+    // }
 }
 
 // =============================================================================
