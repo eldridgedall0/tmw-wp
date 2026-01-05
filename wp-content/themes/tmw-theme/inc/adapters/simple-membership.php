@@ -56,27 +56,11 @@ class TMW_Simple_Membership_Adapter implements TMW_Membership_Adapter_Interface 
             return false;
         }
 
-        // Check if SwpmMemberUtils class exists
-        if (class_exists('SwpmMemberUtils')) {
-            $member = SwpmMemberUtils::get_user_by_user_name(get_user_by('ID', $user_id)->user_login);
-            
-            if ($member) {
-                $account_state = isset($member->account_state) ? $member->account_state : '';
-                return $account_state === 'active';
-            }
-        }
-
-        // Alternative: Check via database directly
-        global $wpdb;
-        $table = $wpdb->prefix . 'swpm_members_tbl';
+        $member = $this->get_member_data($user_id);
         
-        if ($wpdb->get_var("SHOW TABLES LIKE '$table'") === $table) {
-            $status = $wpdb->get_var($wpdb->prepare(
-                "SELECT account_state FROM $table WHERE user_name = %s",
-                get_user_by('ID', $user_id)->user_login
-            ));
-            
-            return $status === 'active';
+        if ($member) {
+            $account_state = isset($member->account_state) ? $member->account_state : '';
+            return $account_state === 'active';
         }
 
         return false;
@@ -93,31 +77,34 @@ class TMW_Simple_Membership_Adapter implements TMW_Membership_Adapter_Interface 
             return null;
         }
 
-        global $wpdb;
-        $table = $wpdb->prefix . 'swpm_members_tbl';
+        $member = $this->get_member_data($user_id);
         
-        if ($wpdb->get_var("SHOW TABLES LIKE '$table'") === $table) {
-            $user = get_user_by('ID', $user_id);
-            if (!$user) {
-                return null;
-            }
+        if (!$member) {
+            return null;
+        }
 
-            $expiry = $wpdb->get_var($wpdb->prepare(
-                "SELECT subscription_starts FROM $table WHERE user_name = %s",
-                $user->user_login
-            ));
+        // Check for subscription_starts field
+        if (!empty($member->subscription_starts)) {
+            // For free/lifetime memberships, this might be the start date
+            // Check if there's an expiry set
+        }
 
-            // Simple Membership stores subscription_starts, not expiry
-            // For recurring, we need to check the Stripe addon data
-            // For now, return subscription_starts as reference
+        // Check for expiry in user meta (set by Stripe addon or manual)
+        $user = get_user_by('ID', $user_id);
+        if ($user) {
+            // Try various meta keys used by SWPM addons
+            $expiry_keys = array(
+                'swpm_subscription_expiry',
+                'swpm_expiry_date',
+                'swpm_account_expiry',
+            );
             
-            // Check for expiry in user meta (set by Stripe addon)
-            $stripe_expiry = get_user_meta($user_id, 'swpm_subscription_expiry', true);
-            if ($stripe_expiry) {
-                return date('Y-m-d', strtotime($stripe_expiry));
+            foreach ($expiry_keys as $key) {
+                $expiry = get_user_meta($user_id, $key, true);
+                if ($expiry) {
+                    return date('Y-m-d', strtotime($expiry));
+                }
             }
-
-            return $expiry ? date('Y-m-d', strtotime($expiry)) : null;
         }
 
         return null;
@@ -134,36 +121,74 @@ class TMW_Simple_Membership_Adapter implements TMW_Membership_Adapter_Interface 
             return null;
         }
 
-        // Try SwpmMemberUtils first
-        if (class_exists('SwpmMemberUtils')) {
-            $user = get_user_by('ID', $user_id);
-            if ($user) {
-                $member = SwpmMemberUtils::get_user_by_user_name($user->user_login);
-                if ($member && isset($member->membership_level)) {
-                    return (int) $member->membership_level;
-                }
-            }
-        }
-
-        // Fallback: Query database directly
-        global $wpdb;
-        $table = $wpdb->prefix . 'swpm_members_tbl';
+        $member = $this->get_member_data($user_id);
         
-        if ($wpdb->get_var("SHOW TABLES LIKE '$table'") === $table) {
-            $user = get_user_by('ID', $user_id);
-            if (!$user) {
-                return null;
-            }
-
-            $level = $wpdb->get_var($wpdb->prepare(
-                "SELECT membership_level FROM $table WHERE user_name = %s",
-                $user->user_login
-            ));
-
-            return $level ? (int) $level : null;
+        if ($member && isset($member->membership_level)) {
+            return (int) $member->membership_level;
         }
 
         return null;
+    }
+
+    /**
+     * Get membership level name from Simple Membership
+     *
+     * @param int $user_id
+     * @return string|null Level name or null
+     */
+    public function get_level_name($user_id) {
+        if (!$this->is_plugin_active()) {
+            return null;
+        }
+
+        $level_id = $this->get_level_id($user_id);
+        
+        if (!$level_id) {
+            return null;
+        }
+
+        // Get level info from database
+        global $wpdb;
+        $table = $wpdb->prefix . 'swpm_membership_tbl';
+        
+        if ($wpdb->get_var("SHOW TABLES LIKE '$table'") !== $table) {
+            return null;
+        }
+
+        $level = $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table WHERE id = %d",
+            $level_id
+        ));
+
+        if ($level && isset($level->alias)) {
+            return $level->alias;
+        }
+
+        return null;
+    }
+
+    /**
+     * Get membership level info
+     *
+     * @param int $level_id
+     * @return object|null
+     */
+    public function get_level_info($level_id) {
+        if (!$this->is_plugin_active()) {
+            return null;
+        }
+
+        global $wpdb;
+        $table = $wpdb->prefix . 'swpm_membership_tbl';
+        
+        if ($wpdb->get_var("SHOW TABLES LIKE '$table'") !== $table) {
+            return null;
+        }
+
+        return $wpdb->get_row($wpdb->prepare(
+            "SELECT * FROM $table WHERE id = %d",
+            $level_id
+        ));
     }
 
     /**
@@ -189,10 +214,21 @@ class TMW_Simple_Membership_Adapter implements TMW_Membership_Adapter_Interface 
             return null;
         }
 
-        return $wpdb->get_row($wpdb->prepare(
+        // Try by username first
+        $member = $wpdb->get_row($wpdb->prepare(
             "SELECT * FROM $table WHERE user_name = %s",
             $user->user_login
         ));
+
+        // If not found, try by email
+        if (!$member) {
+            $member = $wpdb->get_row($wpdb->prepare(
+                "SELECT * FROM $table WHERE email = %s",
+                $user->user_email
+            ));
+        }
+
+        return $member;
     }
 
     /**
@@ -216,6 +252,147 @@ class TMW_Simple_Membership_Adapter implements TMW_Membership_Adapter_Interface 
         
         return $levels ? $levels : array();
     }
+
+    /**
+     * Get Simple Membership page URLs
+     *
+     * @return array
+     */
+    public function get_swpm_page_urls() {
+        $settings = get_option('swpm-settings', array());
+        
+        return array(
+            'login'        => isset($settings['login-page-url']) ? $settings['login-page-url'] : '',
+            'registration' => isset($settings['registration-page-url']) ? $settings['registration-page-url'] : '',
+            'profile'      => isset($settings['profile-page-url']) ? $settings['profile-page-url'] : '',
+            'join'         => isset($settings['join-us-page-url']) ? $settings['join-us-page-url'] : '',
+        );
+    }
+}
+
+// =============================================================================
+// HELPER FUNCTIONS FOR SIMPLE MEMBERSHIP
+// =============================================================================
+
+/**
+ * Get Simple Membership level name for a user
+ *
+ * @param int $user_id
+ * @return string Level name or tier name as fallback
+ */
+function tmw_get_swpm_level_name($user_id = 0) {
+    if (!$user_id) {
+        $user_id = get_current_user_id();
+    }
+
+    $adapter = tmw_get_membership_adapter();
+    
+    if ($adapter && method_exists($adapter, 'get_level_name')) {
+        $name = $adapter->get_level_name($user_id);
+        if ($name) {
+            return $name;
+        }
+    }
+
+    // Fallback to tier name
+    $tier = tmw_get_user_tier($user_id);
+    return tmw_get_tier_name($tier);
+}
+
+/**
+ * Get Simple Membership profile page URL
+ *
+ * @return string
+ */
+function tmw_get_swpm_profile_url() {
+    $adapter = tmw_get_membership_adapter();
+    
+    if ($adapter && method_exists($adapter, 'get_swpm_page_urls')) {
+        $urls = $adapter->get_swpm_page_urls();
+        if (!empty($urls['profile'])) {
+            return $urls['profile'];
+        }
+    }
+
+    // Fallback - try common page slugs
+    $page = get_page_by_path('membership-profile');
+    if ($page) {
+        return get_permalink($page);
+    }
+
+    return home_url('/membership-profile/');
+}
+
+/**
+ * Get Simple Membership join/registration page URL
+ *
+ * @param int|null $level_id Optional level ID to pre-select
+ * @return string
+ */
+function tmw_get_swpm_join_url($level_id = null) {
+    $adapter = tmw_get_membership_adapter();
+    $url = '';
+    
+    if ($adapter && method_exists($adapter, 'get_swpm_page_urls')) {
+        $urls = $adapter->get_swpm_page_urls();
+        if (!empty($urls['join'])) {
+            $url = $urls['join'];
+        } elseif (!empty($urls['registration'])) {
+            $url = $urls['registration'];
+        }
+    }
+
+    // Fallback - try common page slugs
+    if (empty($url)) {
+        $page = get_page_by_path('membership-join');
+        if (!$page) {
+            $page = get_page_by_path('join');
+        }
+        if ($page) {
+            $url = get_permalink($page);
+        } else {
+            $url = home_url('/membership-join/');
+        }
+    }
+
+    // Add level parameter if provided
+    if ($level_id) {
+        $url = add_query_arg('level', $level_id, $url);
+    }
+
+    return $url;
+}
+
+/**
+ * Check if user is on a free/no-cost membership level
+ *
+ * @param int $user_id
+ * @return bool
+ */
+function tmw_is_free_membership($user_id = 0) {
+    if (!$user_id) {
+        $user_id = get_current_user_id();
+    }
+
+    $tier = tmw_get_user_tier($user_id);
+    
+    // Free tier is always free
+    if ($tier === 'free') {
+        return true;
+    }
+
+    // Check the mapped level ID
+    $adapter = tmw_get_membership_adapter();
+    if ($adapter && method_exists($adapter, 'get_level_id')) {
+        $level_id = $adapter->get_level_id($user_id);
+        $free_level_id = tmw_get_level_mapping('free_level_id');
+        
+        if ($level_id && $free_level_id && $level_id == $free_level_id) {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 // =============================================================================
@@ -242,6 +419,10 @@ function tmw_smp_level_changed($member_id, $new_level) {
     }
 
     $user = get_user_by('login', $member->user_name);
+    if (!$user) {
+        $user = get_user_by('email', $member->email);
+    }
+    
     if (!$user) {
         return;
     }
@@ -277,10 +458,37 @@ function tmw_smp_status_changed($member_id, $new_status) {
 
     $user = get_user_by('login', $member->user_name);
     if (!$user) {
+        $user = get_user_by('email', $member->email);
+    }
+    
+    if (!$user) {
         return;
     }
 
     update_user_meta($user->ID, 'tmw_subscription_status', $new_status);
     
     do_action('tmw_subscription_status_changed', $user->ID, $new_status);
+}
+
+/**
+ * Sync user on login
+ */
+add_action('wp_login', 'tmw_sync_swpm_on_login', 10, 2);
+
+function tmw_sync_swpm_on_login($user_login, $user) {
+    $adapter = tmw_get_membership_adapter();
+    
+    if (!$adapter || !$adapter->is_plugin_active()) {
+        return;
+    }
+
+    $member = $adapter->get_member_data($user->ID);
+    
+    if ($member) {
+        // Sync tier
+        $tier = tmw_map_level_to_tier($member->membership_level);
+        update_user_meta($user->ID, 'tmw_subscription_tier', $tier);
+        update_user_meta($user->ID, 'tmw_smp_level_id', $member->membership_level);
+        update_user_meta($user->ID, 'tmw_subscription_status', $member->account_state);
+    }
 }
