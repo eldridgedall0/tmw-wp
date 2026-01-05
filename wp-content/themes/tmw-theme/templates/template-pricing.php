@@ -9,6 +9,10 @@
 $current_tier = is_user_logged_in() ? tmw_get_user_tier() : 'none';
 $comparison = tmw_get_feature_comparison();
 
+// Get level IDs from settings for SWPM join URLs
+$paid_level_id = tmw_get_level_mapping('paid_level_id', 2);
+$fleet_level_id = tmw_get_level_mapping('fleet_level_id', 3);
+
 get_header();
 ?>
 
@@ -96,7 +100,7 @@ get_header();
                     <?php elseif ($current_tier === 'fleet') : ?>
                         <span class="tmw-btn tmw-btn-secondary tmw-btn-full" disabled><?php _e('Downgrade', 'flavor-starter-flavor'); ?></span>
                     <?php else : ?>
-                        <a href="<?php echo esc_url(home_url('/membership-join/?level=2')); ?>" class="tmw-btn tmw-btn-primary tmw-btn-full">
+                        <a href="<?php echo esc_url(tmw_get_swpm_join_url($paid_level_id)); ?>" class="tmw-btn tmw-btn-primary tmw-btn-full">
                             <?php _e('Subscribe Now', 'flavor-starter-flavor'); ?>
                         </a>
                     <?php endif; ?>
@@ -128,7 +132,7 @@ get_header();
                     <?php if ($current_tier === 'fleet') : ?>
                         <span class="tmw-btn tmw-btn-secondary tmw-btn-full" disabled><?php _e('Current Plan', 'flavor-starter-flavor'); ?></span>
                     <?php else : ?>
-                        <a href="<?php echo esc_url(home_url('/membership-join/?level=3')); ?>" class="tmw-btn tmw-btn-secondary tmw-btn-full">
+                        <a href="<?php echo esc_url(tmw_get_swpm_join_url($fleet_level_id)); ?>" class="tmw-btn tmw-btn-secondary tmw-btn-full">
                             <?php _e('Go Fleet', 'flavor-starter-flavor'); ?>
                         </a>
                     <?php endif; ?>
