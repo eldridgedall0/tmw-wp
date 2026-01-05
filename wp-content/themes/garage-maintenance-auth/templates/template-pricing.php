@@ -1,0 +1,248 @@
+<?php
+/**
+ * Template Name: Pricing
+ * Template Post Type: page
+ *
+ * @package flavor-starter-flavor
+ */
+
+$current_tier = is_user_logged_in() ? tmw_get_user_tier() : 'none';
+$comparison = tmw_get_feature_comparison();
+
+get_header();
+?>
+
+<div class="tmw-pricing-page">
+    <div class="tmw-container">
+
+        <!-- Header -->
+        <header class="tmw-section-header">
+            <h1 class="tmw-section-title"><?php _e('Choose Your Plan', 'flavor-starter-flavor'); ?></h1>
+            <p class="tmw-section-subtitle">
+                <?php _e('Start free, upgrade when you need more. All plans include core features.', 'flavor-starter-flavor'); ?>
+            </p>
+        </header>
+
+        <!-- Pricing Toggle -->
+        <div class="tmw-pricing-toggle">
+            <span class="tmw-pricing-toggle-label active" data-period="monthly"><?php _e('Monthly', 'flavor-starter-flavor'); ?></span>
+            <button type="button" class="tmw-pricing-switch" aria-label="<?php esc_attr_e('Toggle annual pricing', 'flavor-starter-flavor'); ?>"></button>
+            <span class="tmw-pricing-toggle-label" data-period="yearly"><?php _e('Yearly', 'flavor-starter-flavor'); ?></span>
+            <span class="tmw-pricing-save"><?php _e('Save 20%', 'flavor-starter-flavor'); ?></span>
+        </div>
+
+        <!-- Pricing Cards -->
+        <div class="tmw-pricing-grid">
+            
+            <?php
+            $free_limits = tmw_get_tier_limits('free');
+            $paid_limits = tmw_get_tier_limits('paid');
+            $fleet_limits = tmw_get_tier_limits('fleet');
+            ?>
+
+            <!-- Free Tier -->
+            <div class="tmw-pricing-card <?php echo $current_tier === 'free' ? 'tmw-pricing-current' : ''; ?>">
+                <div class="tmw-pricing-header">
+                    <h3 class="tmw-pricing-name"><?php _e('Free', 'flavor-starter-flavor'); ?></h3>
+                    <div class="tmw-pricing-price">
+                        <span class="tmw-pricing-currency">$</span>
+                        <span class="tmw-pricing-amount" data-price-monthly="0" data-price-yearly="0">0</span>
+                        <span class="tmw-pricing-period">/month</span>
+                    </div>
+                </div>
+                <ul class="tmw-pricing-features">
+                    <li><i class="fas fa-check"></i> <?php printf(__('%d Vehicles', 'flavor-starter-flavor'), $free_limits['max_vehicles']); ?></li>
+                    <li><i class="fas fa-check"></i> <?php printf(__('%d Total Entries', 'flavor-starter-flavor'), $free_limits['max_entries']); ?></li>
+                    <li><i class="fas fa-check"></i> <?php printf(__('%d Templates', 'flavor-starter-flavor'), $free_limits['max_templates']); ?></li>
+                    <li class="disabled"><i class="fas fa-times"></i> <?php _e('No Attachments', 'flavor-starter-flavor'); ?></li>
+                    <li class="disabled"><i class="fas fa-times"></i> <?php _e('No Recall Alerts', 'flavor-starter-flavor'); ?></li>
+                    <li class="disabled"><i class="fas fa-times"></i> <?php _e('No Export', 'flavor-starter-flavor'); ?></li>
+                </ul>
+                <div class="tmw-pricing-footer">
+                    <?php if ($current_tier === 'free') : ?>
+                        <span class="tmw-btn tmw-btn-secondary tmw-btn-full" disabled><?php _e('Current Plan', 'flavor-starter-flavor'); ?></span>
+                    <?php elseif (is_user_logged_in()) : ?>
+                        <span class="tmw-btn tmw-btn-secondary tmw-btn-full" disabled><?php _e('Free Plan', 'flavor-starter-flavor'); ?></span>
+                    <?php else : ?>
+                        <a href="<?php echo esc_url(tmw_get_page_url('register')); ?>" class="tmw-btn tmw-btn-secondary tmw-btn-full">
+                            <?php _e('Get Started', 'flavor-starter-flavor'); ?>
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Paid Tier -->
+            <div class="tmw-pricing-card tmw-pricing-popular <?php echo $current_tier === 'paid' ? 'tmw-pricing-current' : ''; ?>">
+                <div class="tmw-pricing-badge"><?php _e('Most Popular', 'flavor-starter-flavor'); ?></div>
+                <div class="tmw-pricing-header">
+                    <h3 class="tmw-pricing-name"><?php _e('Paid', 'flavor-starter-flavor'); ?></h3>
+                    <div class="tmw-pricing-price">
+                        <span class="tmw-pricing-currency">$</span>
+                        <span class="tmw-pricing-amount" data-price-monthly="9" data-price-yearly="86">9</span>
+                        <span class="tmw-pricing-period">/month</span>
+                    </div>
+                </div>
+                <ul class="tmw-pricing-features">
+                    <li><i class="fas fa-check"></i> <?php printf(__('%d Vehicles', 'flavor-starter-flavor'), $paid_limits['max_vehicles']); ?></li>
+                    <li><i class="fas fa-check"></i> <?php _e('Unlimited Entries', 'flavor-starter-flavor'); ?></li>
+                    <li><i class="fas fa-check"></i> <?php printf(__('%d Templates', 'flavor-starter-flavor'), $paid_limits['max_templates']); ?></li>
+                    <li><i class="fas fa-check"></i> <?php printf(__('%d Attachments/Entry', 'flavor-starter-flavor'), $paid_limits['attachments_per_entry']); ?></li>
+                    <li><i class="fas fa-check"></i> <?php _e('Recall Alerts', 'flavor-starter-flavor'); ?></li>
+                    <li><i class="fas fa-check"></i> <?php _e('CSV & PDF Export', 'flavor-starter-flavor'); ?></li>
+                </ul>
+                <div class="tmw-pricing-footer">
+                    <?php if ($current_tier === 'paid') : ?>
+                        <span class="tmw-btn tmw-btn-primary tmw-btn-full" disabled><?php _e('Current Plan', 'flavor-starter-flavor'); ?></span>
+                    <?php elseif ($current_tier === 'fleet') : ?>
+                        <span class="tmw-btn tmw-btn-secondary tmw-btn-full" disabled><?php _e('Downgrade', 'flavor-starter-flavor'); ?></span>
+                    <?php else : ?>
+                        <a href="<?php echo esc_url(home_url('/membership-join/?level=2')); ?>" class="tmw-btn tmw-btn-primary tmw-btn-full">
+                            <?php _e('Subscribe Now', 'flavor-starter-flavor'); ?>
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+            <!-- Fleet Tier -->
+            <div class="tmw-pricing-card <?php echo $current_tier === 'fleet' ? 'tmw-pricing-current' : ''; ?>">
+                <div class="tmw-pricing-header">
+                    <h3 class="tmw-pricing-name"><?php _e('Fleet', 'flavor-starter-flavor'); ?></h3>
+                    <div class="tmw-pricing-price">
+                        <span class="tmw-pricing-currency">$</span>
+                        <span class="tmw-pricing-amount" data-price-monthly="29" data-price-yearly="278">29</span>
+                        <span class="tmw-pricing-period">/month</span>
+                    </div>
+                </div>
+                <ul class="tmw-pricing-features">
+                    <li><i class="fas fa-check"></i> <?php _e('Unlimited Vehicles', 'flavor-starter-flavor'); ?></li>
+                    <li><i class="fas fa-check"></i> <?php _e('Unlimited Entries', 'flavor-starter-flavor'); ?></li>
+                    <li><i class="fas fa-check"></i> <?php _e('Unlimited Templates', 'flavor-starter-flavor'); ?></li>
+                    <li><i class="fas fa-check"></i> <?php printf(__('%d Attachments/Entry', 'flavor-starter-flavor'), $fleet_limits['attachments_per_entry']); ?></li>
+                    <li><i class="fas fa-check"></i> <?php _e('Bulk Export + API', 'flavor-starter-flavor'); ?></li>
+                    <li>
+                        <i class="fas fa-check"></i> <?php _e('Team Members', 'flavor-starter-flavor'); ?>
+                        <span class="tmw-feature-badge"><?php _e('Soon', 'flavor-starter-flavor'); ?></span>
+                    </li>
+                </ul>
+                <div class="tmw-pricing-footer">
+                    <?php if ($current_tier === 'fleet') : ?>
+                        <span class="tmw-btn tmw-btn-secondary tmw-btn-full" disabled><?php _e('Current Plan', 'flavor-starter-flavor'); ?></span>
+                    <?php else : ?>
+                        <a href="<?php echo esc_url(home_url('/membership-join/?level=3')); ?>" class="tmw-btn tmw-btn-secondary tmw-btn-full">
+                            <?php _e('Go Fleet', 'flavor-starter-flavor'); ?>
+                        </a>
+                    <?php endif; ?>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Feature Comparison Table -->
+        <div class="tmw-pricing-table-wrap">
+            <table class="tmw-pricing-table">
+                <thead>
+                    <tr>
+                        <th><?php _e('Feature', 'flavor-starter-flavor'); ?></th>
+                        <th><?php _e('Free', 'flavor-starter-flavor'); ?></th>
+                        <th class="tmw-pricing-table-header popular"><?php _e('Paid', 'flavor-starter-flavor'); ?></th>
+                        <th><?php _e('Fleet', 'flavor-starter-flavor'); ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($comparison as $feature) : ?>
+                    <tr>
+                        <td><?php echo esc_html($feature['name']); ?></td>
+                        <td>
+                            <?php if (is_bool($feature['free'])) : ?>
+                                <i class="fas fa-<?php echo $feature['free'] ? 'check' : 'times'; ?>"></i>
+                            <?php else : ?>
+                                <?php echo esc_html($feature['free']); ?>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php if (is_bool($feature['paid'])) : ?>
+                                <i class="fas fa-<?php echo $feature['paid'] ? 'check' : 'times'; ?>"></i>
+                            <?php else : ?>
+                                <?php echo esc_html($feature['paid']); ?>
+                            <?php endif; ?>
+                        </td>
+                        <td>
+                            <?php if (is_bool($feature['fleet'])) : ?>
+                                <i class="fas fa-<?php echo $feature['fleet'] ? 'check' : 'times'; ?>"></i>
+                            <?php else : ?>
+                                <?php echo esc_html($feature['fleet']); ?>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Money Back Guarantee -->
+        <div class="tmw-guarantee">
+            <div class="tmw-guarantee-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h3 class="tmw-guarantee-title"><?php _e('30-Day Money Back Guarantee', 'flavor-starter-flavor'); ?></h3>
+            <p class="tmw-guarantee-text">
+                <?php _e("Not happy? We'll refund your payment within the first 30 days, no questions asked.", 'flavor-starter-flavor'); ?>
+            </p>
+        </div>
+
+        <!-- FAQ Section -->
+        <section class="tmw-faq-section">
+            <header class="tmw-section-header">
+                <h2 class="tmw-section-title"><?php _e('Frequently Asked Questions', 'flavor-starter-flavor'); ?></h2>
+            </header>
+
+            <div class="tmw-faq-list">
+                
+                <div class="tmw-faq-item">
+                    <button class="tmw-faq-question">
+                        <?php _e('Can I change plans later?', 'flavor-starter-flavor'); ?>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="tmw-faq-answer">
+                        <?php _e('Yes! You can upgrade or downgrade your plan at any time. When upgrading, you\'ll be prorated for the remainder of your billing cycle. When downgrading, your new plan will take effect at the start of your next billing cycle.', 'flavor-starter-flavor'); ?>
+                    </div>
+                </div>
+
+                <div class="tmw-faq-item">
+                    <button class="tmw-faq-question">
+                        <?php _e('What payment methods do you accept?', 'flavor-starter-flavor'); ?>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="tmw-faq-answer">
+                        <?php _e('We accept all major credit cards (Visa, Mastercard, American Express, Discover) through our secure payment processor, Stripe.', 'flavor-starter-flavor'); ?>
+                    </div>
+                </div>
+
+                <div class="tmw-faq-item">
+                    <button class="tmw-faq-question">
+                        <?php _e('Is my data secure?', 'flavor-starter-flavor'); ?>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="tmw-faq-answer">
+                        <?php _e('Absolutely. We use industry-standard encryption to protect your data both in transit and at rest. Your maintenance records are stored securely and are only accessible by you.', 'flavor-starter-flavor'); ?>
+                    </div>
+                </div>
+
+                <div class="tmw-faq-item">
+                    <button class="tmw-faq-question">
+                        <?php _e('Can I cancel anytime?', 'flavor-starter-flavor'); ?>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="tmw-faq-answer">
+                        <?php _e('Yes, you can cancel your subscription at any time. Your access will continue until the end of your current billing period. Your data will be retained and accessible if you decide to resubscribe.', 'flavor-starter-flavor'); ?>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </div>
+</div>
+
+<?php
+get_footer();

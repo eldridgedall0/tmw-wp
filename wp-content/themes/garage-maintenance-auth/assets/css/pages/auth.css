@@ -1,0 +1,393 @@
+/**
+ * Auth Pages Styles
+ *
+ * Login, Register, Forgot Password, Reset Password, Profile
+ *
+ * @package flavor-starter-flavor
+ */
+
+/* ==========================================================================
+   AUTH PAGE BACKGROUND
+   ========================================================================== */
+.tmw-auth-page {
+    background: linear-gradient(
+        180deg,
+        var(--tmw-bg-primary) 0%,
+        var(--tmw-bg-secondary) 100%
+    );
+}
+
+.tmw-auth-page::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(
+        ellipse at top left,
+        var(--tmw-accent-light) 0%,
+        transparent 40%
+    );
+    pointer-events: none;
+    z-index: 0;
+}
+
+.tmw-auth-container {
+    position: relative;
+    z-index: 1;
+}
+
+/* ==========================================================================
+   AUTH CARD ENHANCEMENTS
+   ========================================================================== */
+.tmw-auth-card {
+    backdrop-filter: blur(10px);
+}
+
+/* Logo animation */
+.tmw-auth-logo img {
+    animation: tmw-logo-pulse 2s ease-in-out infinite;
+}
+
+@keyframes tmw-logo-pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* ==========================================================================
+   FORM REMEMBER ME / FORGOT PASSWORD ROW
+   ========================================================================== */
+.tmw-auth-extras {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--tmw-space-6);
+    font-size: var(--tmw-text-sm);
+}
+
+.tmw-auth-remember {
+    display: flex;
+    align-items: center;
+    gap: var(--tmw-space-2);
+    cursor: pointer;
+    color: var(--tmw-text-secondary);
+}
+
+.tmw-auth-remember input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--tmw-accent);
+}
+
+.tmw-auth-forgot {
+    color: var(--tmw-accent);
+    font-weight: var(--tmw-font-medium);
+}
+
+.tmw-auth-forgot:hover {
+    color: var(--tmw-accent-hover);
+}
+
+/* ==========================================================================
+   PASSWORD STRENGTH METER
+   ========================================================================== */
+.tmw-password-strength {
+    margin-top: var(--tmw-space-2);
+}
+
+.tmw-password-strength-bar {
+    height: 4px;
+    background-color: var(--tmw-bg-tertiary);
+    border-radius: var(--tmw-radius-full);
+    overflow: hidden;
+}
+
+.tmw-password-strength-fill {
+    height: 100%;
+    width: 0;
+    border-radius: var(--tmw-radius-full);
+    transition: all var(--tmw-transition);
+}
+
+.tmw-password-strength-fill.weak {
+    width: 33%;
+    background-color: var(--tmw-error);
+}
+
+.tmw-password-strength-fill.medium {
+    width: 66%;
+    background-color: var(--tmw-warning);
+}
+
+.tmw-password-strength-fill.strong {
+    width: 100%;
+    background-color: var(--tmw-success);
+}
+
+.tmw-password-strength-text {
+    display: flex;
+    justify-content: space-between;
+    margin-top: var(--tmw-space-1);
+    font-size: var(--tmw-text-xs);
+    color: var(--tmw-text-muted);
+}
+
+/* ==========================================================================
+   PASSWORD MATCH INDICATOR
+   ========================================================================== */
+.tmw-password-match {
+    display: flex;
+    align-items: center;
+    gap: var(--tmw-space-2);
+    margin-top: var(--tmw-space-2);
+    font-size: var(--tmw-text-sm);
+}
+
+.tmw-password-match.match {
+    color: var(--tmw-success);
+}
+
+.tmw-password-match.no-match {
+    color: var(--tmw-error);
+}
+
+/* ==========================================================================
+   SOCIAL LOGIN (Future)
+   ========================================================================== */
+.tmw-social-login {
+    display: flex;
+    flex-direction: column;
+    gap: var(--tmw-space-3);
+}
+
+.tmw-social-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--tmw-space-3);
+    width: 100%;
+    padding: var(--tmw-space-3) var(--tmw-space-4);
+    background-color: var(--tmw-bg-tertiary);
+    border: 1px solid var(--tmw-border);
+    border-radius: var(--tmw-radius);
+    color: var(--tmw-text-primary);
+    font-weight: var(--tmw-font-medium);
+    transition: all var(--tmw-transition-fast);
+}
+
+.tmw-social-btn:hover {
+    background-color: var(--tmw-border);
+    border-color: var(--tmw-border-light);
+}
+
+.tmw-social-btn i {
+    font-size: var(--tmw-text-lg);
+}
+
+/* ==========================================================================
+   PROFILE PAGE
+   ========================================================================== */
+.tmw-profile-page {
+    padding: var(--tmw-space-8) 0;
+}
+
+.tmw-profile-header {
+    display: flex;
+    align-items: center;
+    gap: var(--tmw-space-6);
+    margin-bottom: var(--tmw-space-8);
+    padding-bottom: var(--tmw-space-8);
+    border-bottom: 1px solid var(--tmw-border);
+}
+
+.tmw-profile-avatar-wrap {
+    position: relative;
+}
+
+.tmw-profile-avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: var(--tmw-radius-full);
+    object-fit: cover;
+    border: 3px solid var(--tmw-border);
+}
+
+.tmw-profile-avatar-edit {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--tmw-accent);
+    color: var(--tmw-text-inverse);
+    border-radius: var(--tmw-radius-full);
+    border: 2px solid var(--tmw-bg-secondary);
+    cursor: pointer;
+    transition: background-color var(--tmw-transition-fast);
+}
+
+.tmw-profile-avatar-edit:hover {
+    background-color: var(--tmw-accent-hover);
+}
+
+.tmw-profile-info h1 {
+    font-size: var(--tmw-text-2xl);
+    margin-bottom: var(--tmw-space-1);
+}
+
+.tmw-profile-email {
+    color: var(--tmw-text-muted);
+    margin-bottom: var(--tmw-space-2);
+}
+
+.tmw-profile-tier {
+    display: inline-flex;
+}
+
+/* Profile Sections */
+.tmw-profile-section {
+    margin-bottom: var(--tmw-space-8);
+}
+
+.tmw-profile-section-title {
+    font-size: var(--tmw-text-lg);
+    font-weight: var(--tmw-font-semibold);
+    margin-bottom: var(--tmw-space-4);
+    padding-bottom: var(--tmw-space-3);
+    border-bottom: 1px solid var(--tmw-border);
+}
+
+/* Subscription Card on Profile */
+.tmw-subscription-card {
+    background-color: var(--tmw-card-bg);
+    border: 1px solid var(--tmw-border);
+    border-radius: var(--tmw-radius-lg);
+    padding: var(--tmw-space-6);
+}
+
+.tmw-subscription-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--tmw-space-4);
+}
+
+.tmw-subscription-tier {
+    font-size: var(--tmw-text-xl);
+    font-weight: var(--tmw-font-semibold);
+}
+
+.tmw-subscription-status {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--tmw-space-2);
+    padding: var(--tmw-space-1) var(--tmw-space-3);
+    background-color: var(--tmw-success-light);
+    color: var(--tmw-success);
+    border-radius: var(--tmw-radius-full);
+    font-size: var(--tmw-text-sm);
+    font-weight: var(--tmw-font-medium);
+}
+
+.tmw-subscription-status.inactive {
+    background-color: var(--tmw-error-light);
+    color: var(--tmw-error);
+}
+
+.tmw-subscription-details {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--tmw-space-4);
+    margin-bottom: var(--tmw-space-4);
+}
+
+.tmw-subscription-detail {
+    font-size: var(--tmw-text-sm);
+}
+
+.tmw-subscription-detail-label {
+    color: var(--tmw-text-muted);
+    margin-bottom: var(--tmw-space-1);
+}
+
+.tmw-subscription-actions {
+    display: flex;
+    gap: var(--tmw-space-3);
+    padding-top: var(--tmw-space-4);
+    border-top: 1px solid var(--tmw-border);
+}
+
+/* ==========================================================================
+   TWO COLUMN FORM LAYOUT
+   ========================================================================== */
+.tmw-form-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--tmw-space-4);
+}
+
+@media (max-width: 639px) {
+    .tmw-form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================================================
+   LOGOUT PAGE
+   ========================================================================== */
+.tmw-logout-page {
+    text-align: center;
+}
+
+.tmw-logout-icon {
+    font-size: 4rem;
+    color: var(--tmw-success);
+    margin-bottom: var(--tmw-space-4);
+}
+
+.tmw-logout-title {
+    font-size: var(--tmw-text-2xl);
+    margin-bottom: var(--tmw-space-2);
+}
+
+.tmw-logout-text {
+    color: var(--tmw-text-muted);
+    margin-bottom: var(--tmw-space-6);
+}
+
+/* ==========================================================================
+   RESPONSIVE AUTH
+   ========================================================================== */
+@media (max-width: 479px) {
+    .tmw-auth-card {
+        padding: var(--tmw-space-6);
+        border-radius: var(--tmw-radius-lg);
+    }
+
+    .tmw-auth-extras {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--tmw-space-3);
+    }
+
+    .tmw-profile-header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .tmw-subscription-details {
+        grid-template-columns: 1fr;
+    }
+
+    .tmw-subscription-actions {
+        flex-direction: column;
+    }
+}
