@@ -104,20 +104,21 @@ function tmw_ajax_register() {
         ));
     }
 
-    $username = isset($_POST['username']) ? sanitize_user($_POST['username']) : '';
-    $email    = isset($_POST['email']) ? sanitize_email($_POST['email']) : '';
-    $password = isset($_POST['password']) ? $_POST['password'] : '';
+    $first_name = isset($_POST['first_name']) ? sanitize_text_field($_POST['first_name']) : '';
+    $last_name  = isset($_POST['last_name']) ? sanitize_text_field($_POST['last_name']) : '';
+    $email      = isset($_POST['email']) ? sanitize_email($_POST['email']) : '';
+    $password   = isset($_POST['password']) ? $_POST['password'] : '';
     $password_confirm = isset($_POST['password_confirm']) ? $_POST['password_confirm'] : '';
 
     // Validation
     $errors = array();
 
-    if (empty($username)) {
-        $errors[] = __('Please enter a username.', 'flavor-starter-flavor');
-    } elseif (!validate_username($username)) {
-        $errors[] = __('Invalid username. Use only letters, numbers, and underscores.', 'flavor-starter-flavor');
-    } elseif (username_exists($username)) {
-        $errors[] = __('This username is already taken.', 'flavor-starter-flavor');
+    if (empty($first_name)) {
+        $errors[] = __('Please enter your first name.', 'flavor-starter-flavor');
+    }
+
+    if (empty($last_name)) {
+        $errors[] = __('Please enter your last name.', 'flavor-starter-flavor');
     }
 
     if (empty($email)) {
@@ -144,6 +145,17 @@ function tmw_ajax_register() {
         ));
     }
 
+    // Generate username from email (part before @)
+    $username_base = sanitize_user(strstr($email, '@', true), true);
+    $username = $username_base;
+    $counter = 1;
+    
+    // Ensure unique username
+    while (username_exists($username)) {
+        $username = $username_base . $counter;
+        $counter++;
+    }
+
     // Create user
     $user_id = wp_create_user($username, $password, $email);
 
@@ -156,6 +168,14 @@ function tmw_ajax_register() {
     // Set default role
     $user = new WP_User($user_id);
     $user->set_role(get_option('default_role', 'subscriber'));
+
+    // Update user profile with name
+    wp_update_user(array(
+        'ID'           => $user_id,
+        'first_name'   => $first_name,
+        'last_name'    => $last_name,
+        'display_name' => trim($first_name . ' ' . $last_name),
+    ));
 
     // Set default subscription tier to free
     update_user_meta($user_id, 'tmw_subscription_tier', 'free');
@@ -185,11 +205,17 @@ add_action('wp_ajax_nopriv_tmw_forgot_password', 'tmw_ajax_forgot_password');
 function tmw_ajax_forgot_password() {
     check_ajax_referer('tmw_nonce', 'nonce');
 
-    $user_login = isset($_POST['user_login']) ? sanitize_text_field($_POST['user_login']) : '';
+    // Accept either 'email' or 'user_login' field name
+    $user_login = '';
+    if (isset($_POST['email']) && !empty($_POST['email'])) {
+        $user_login = sanitize_text_field($_POST['email']);
+    } elseif (isset($_POST['user_login']) && !empty($_POST['user_login'])) {
+        $user_login = sanitize_text_field($_POST['user_login']);
+    }
 
     if (empty($user_login)) {
         wp_send_json_error(array(
-            'message' => __('Please enter your username or email address.', 'flavor-starter-flavor'),
+            'message' => __('Please enter your email address.', 'flavor-starter-flavor'),
         ));
     }
 
