@@ -210,6 +210,40 @@ function tmw_get_upgrade_url($current_tier = null) {
     return $pricing_page;
 }
 
+/**
+ * Check if user is on a free/no-cost membership level
+ *
+ * @param int $user_id
+ * @return bool
+ */
+if (!function_exists('tmw_is_free_membership')) {
+    function tmw_is_free_membership($user_id = 0) {
+        if (!$user_id) {
+            $user_id = get_current_user_id();
+        }
+
+        $tier = tmw_get_user_tier($user_id);
+        
+        // Free tier is always free
+        if ($tier === 'free' || $tier === 'none') {
+            return true;
+        }
+
+        // Check the mapped level ID
+        $adapter = tmw_get_membership_adapter();
+        if ($adapter && method_exists($adapter, 'get_level_id')) {
+            $level_id = $adapter->get_level_id($user_id);
+            $free_level_id = tmw_get_level_mapping('free_level_id');
+            
+            if ($level_id && $free_level_id && $level_id == $free_level_id) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
+
 // =============================================================================
 // SUBSCRIPTION DATA FOR REST API / APP
 // =============================================================================
@@ -227,21 +261,33 @@ function tmw_get_user_subscription_data($user_id = 0) {
 
     if (!$user_id) {
         return array(
-            'tier'      => 'none',
-            'active'    => false,
-            'limits'    => tmw_get_tier_limits('free'),
-            'expires'   => null,
+            'tier'        => 'none',
+            'tier_name'   => tmw_get_tier_name('none'),
+            'is_active'   => false,
+            'active'      => false, // Alias for compatibility
+            'limits'      => tmw_get_tier_limits('free'),
+            'expiry_date' => null,
+            'expires'     => null, // Alias for compatibility
+            'upgrade_url' => tmw_get_upgrade_url('none'),
         );
     }
 
     $tier = tmw_get_user_tier($user_id);
+    $is_free = tmw_is_free_membership($user_id);
+    
+    // For free tier, always consider active (no subscription to expire)
+    $is_active = $is_free ? true : tmw_user_has_active_subscription($user_id);
+    $expiry_date = tmw_get_subscription_expiry($user_id);
     
     return array(
-        'tier'      => $tier,
-        'tier_name' => tmw_get_tier_name($tier),
-        'active'    => tmw_user_has_active_subscription($user_id),
-        'limits'    => tmw_get_tier_limits($tier),
-        'expires'   => tmw_get_subscription_expiry($user_id),
+        'tier'        => $tier,
+        'tier_name'   => tmw_get_tier_name($tier),
+        'is_active'   => $is_active,
+        'active'      => $is_active, // Alias for compatibility
+        'is_free'     => $is_free,
+        'limits'      => tmw_get_tier_limits($tier),
+        'expiry_date' => $expiry_date,
+        'expires'     => $expiry_date, // Alias for compatibility
         'upgrade_url' => tmw_get_upgrade_url($tier),
     );
 }
@@ -348,4 +394,104 @@ function tmw_subscription_changed($user_id, $old_tier, $new_tier) {
     // Update user meta with tier
     update_user_meta($user_id, 'tmw_subscription_tier', $new_tier);
     update_user_meta($user_id, 'tmw_tier_changed', current_time('mysql'));
+}
+
+// =============================================================================
+// MEMBERSHIP PLUGIN HELPER FUNCTIONS (Fallbacks)
+// =============================================================================
+
+/**
+ * Get membership level name for a user
+ * Falls back to tier name if adapter function not available
+ *
+ * @param int $user_id
+ * @return string Level name
+ */
+if (!function_exists('tmw_get_swpm_level_name')) {
+    function tmw_get_swpm_level_name($user_id = 0) {
+        if (!$user_id) {
+            $user_id = get_current_user_id();
+        }
+
+        $adapter = tmw_get_membership_adapter();
+        
+        if ($adapter && method_exists($adapter, 'get_level_name')) {
+            $name = $adapter->get_level_name($user_id);
+            if ($name) {
+                return $name;
+            }
+        }
+
+        // Fallback to tier name
+        $tier = tmw_get_user_tier($user_id);
+        return tmw_get_tier_name($tier);
+    }
+}
+
+/**
+ * Get membership profile page URL
+ *
+ * @return string
+ */
+if (!function_exists('tmw_get_swpm_profile_url')) {
+    function tmw_get_swpm_profile_url() {
+        $adapter = tmw_get_membership_adapter();
+        
+        if ($adapter && method_exists($adapter, 'get_swpm_page_urls')) {
+            $urls = $adapter->get_swpm_page_urls();
+            if (!empty($urls['profile'])) {
+                return $urls['profile'];
+            }
+        }
+
+        // Fallback - try common page slugs
+        $page = get_page_by_path('membership-profile');
+        if ($page) {
+            return get_permalink($page);
+        }
+
+        return home_url('/membership-profile/');
+    }
+}
+
+/**
+ * Get membership join/registration page URL
+ *
+ * @param int|null $level_id Optional level ID to pre-select
+ * @return string
+ */
+if (!function_exists('tmw_get_swpm_join_url')) {
+    function tmw_get_swpm_join_url($level_id = null) {
+        $adapter = tmw_get_membership_adapter();
+        $url = '';
+        
+        if ($adapter && method_exists($adapter, 'get_swpm_page_urls')) {
+            $urls = $adapter->get_swpm_page_urls();
+            if (!empty($urls['join'])) {
+                $url = $urls['join'];
+            } elseif (!empty($urls['registration'])) {
+                $url = $urls['registration'];
+            }
+        }
+
+        // Fallback - try common page slugs
+        if (empty($url)) {
+            $page = get_page_by_path('membership-join');
+            if (!$page) {
+                $page = get_page_by_path('join');
+            }
+            if ($page) {
+                $url = get_permalink($page);
+            } else {
+                $url = home_url('/membership-join/');
+            }
+        }
+
+        // Add level parameter if provided
+        if ($level_id) {
+            $url = add_query_arg('level', $level_id, $url);
+        }
+
+        return $url;
+    }
 }
