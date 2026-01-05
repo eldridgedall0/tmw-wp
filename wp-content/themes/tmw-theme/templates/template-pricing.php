@@ -144,7 +144,7 @@ get_header();
                     <tr>
                         <th><?php _e('Feature', 'flavor-starter-flavor'); ?></th>
                         <th><?php _e('Free', 'flavor-starter-flavor'); ?></th>
-                        <th class="tmw-pricing-table-header popular"><?php _e('Paid', 'flavor-starter-flavor'); ?></th>
+                        <th class="tmw-pricing-table-popular"><?php _e('Paid', 'flavor-starter-flavor'); ?></th>
                         <th><?php _e('Fleet', 'flavor-starter-flavor'); ?></th>
                     </tr>
                 </thead>
@@ -154,23 +154,23 @@ get_header();
                         <td><?php echo esc_html($feature['name']); ?></td>
                         <td>
                             <?php if (is_bool($feature['free'])) : ?>
-                                <i class="fas fa-<?php echo $feature['free'] ? 'check' : 'times'; ?>"></i>
+                                <i class="fas fa-<?php echo $feature['free'] ? 'check text-success' : 'times text-muted'; ?>"></i>
                             <?php else : ?>
-                                <?php echo esc_html($feature['free']); ?>
+                                <?php echo wp_kses_post($feature['free']); ?>
                             <?php endif; ?>
                         </td>
                         <td>
                             <?php if (is_bool($feature['paid'])) : ?>
-                                <i class="fas fa-<?php echo $feature['paid'] ? 'check' : 'times'; ?>"></i>
+                                <i class="fas fa-<?php echo $feature['paid'] ? 'check text-success' : 'times text-muted'; ?>"></i>
                             <?php else : ?>
-                                <?php echo esc_html($feature['paid']); ?>
+                                <?php echo wp_kses_post($feature['paid']); ?>
                             <?php endif; ?>
                         </td>
                         <td>
                             <?php if (is_bool($feature['fleet'])) : ?>
-                                <i class="fas fa-<?php echo $feature['fleet'] ? 'check' : 'times'; ?>"></i>
+                                <i class="fas fa-<?php echo $feature['fleet'] ? 'check text-success' : 'times text-muted'; ?>"></i>
                             <?php else : ?>
-                                <?php echo esc_html($feature['fleet']); ?>
+                                <?php echo wp_kses_post($feature['fleet']); ?>
                             <?php endif; ?>
                         </td>
                     </tr>
