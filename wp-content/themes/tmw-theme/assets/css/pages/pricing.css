@@ -11,23 +11,281 @@
     padding: var(--tmw-space-12) 0;
 }
 
+.tmw-pricing-page .tmw-section-header {
+    text-align: center;
+    margin-bottom: var(--tmw-space-10);
+}
+
+.tmw-pricing-page .tmw-section-title {
+    font-size: var(--tmw-text-3xl);
+    font-weight: var(--tmw-font-bold);
+    margin-bottom: var(--tmw-space-3);
+}
+
+.tmw-pricing-page .tmw-section-subtitle {
+    font-size: var(--tmw-text-lg);
+    color: var(--tmw-text-muted);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* ==========================================================================
+   PRICING TOGGLE (Monthly/Yearly)
+   ========================================================================== */
+.tmw-pricing-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--tmw-space-3);
+    margin-bottom: var(--tmw-space-10);
+}
+
+.tmw-pricing-toggle-label {
+    font-size: var(--tmw-text-sm);
+    font-weight: var(--tmw-font-medium);
+    color: var(--tmw-text-muted);
+    cursor: pointer;
+    transition: color var(--tmw-transition-fast);
+}
+
+.tmw-pricing-toggle-label.active {
+    color: var(--tmw-text-primary);
+}
+
+.tmw-pricing-switch {
+    position: relative;
+    width: 56px;
+    height: 28px;
+    background-color: var(--tmw-bg-tertiary);
+    border: 2px solid var(--tmw-border);
+    border-radius: var(--tmw-radius-full);
+    cursor: pointer;
+    transition: all var(--tmw-transition-fast);
+}
+
+.tmw-pricing-switch:hover {
+    border-color: var(--tmw-accent);
+}
+
+.tmw-pricing-switch.active {
+    background-color: var(--tmw-accent);
+    border-color: var(--tmw-accent);
+}
+
+.tmw-pricing-switch::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 20px;
+    height: 20px;
+    background-color: white;
+    border-radius: var(--tmw-radius-full);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: transform var(--tmw-transition-fast);
+}
+
+.tmw-pricing-switch.active::after {
+    transform: translateX(28px);
+}
+
+.tmw-pricing-save {
+    font-size: var(--tmw-text-xs);
+    font-weight: var(--tmw-font-bold);
+    color: var(--tmw-success);
+    background-color: rgba(16, 185, 129, 0.1);
+    padding: var(--tmw-space-1) var(--tmw-space-3);
+    border-radius: var(--tmw-radius-full);
+}
+
+/* ==========================================================================
+   PRICING GRID
+   ========================================================================== */
+.tmw-pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--tmw-space-6);
+    max-width: 1000px;
+    margin: 0 auto var(--tmw-space-12);
+}
+
+/* ==========================================================================
+   PRICING CARDS
+   ========================================================================== */
+.tmw-pricing-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--tmw-card-bg);
+    border: 2px solid var(--tmw-border);
+    border-radius: var(--tmw-radius-xl);
+    padding: var(--tmw-space-8);
+    transition: all var(--tmw-transition);
+}
+
+.tmw-pricing-card:hover {
+    border-color: var(--tmw-border-light);
+    transform: translateY(-4px);
+    box-shadow: var(--tmw-shadow-lg);
+}
+
+/* Popular Card */
+.tmw-pricing-popular {
+    border-color: var(--tmw-accent);
+    transform: scale(1.05);
+    box-shadow: 0 0 40px rgba(56, 189, 248, 0.15);
+}
+
+.tmw-pricing-popular:hover {
+    border-color: var(--tmw-accent);
+    transform: scale(1.05) translateY(-4px);
+}
+
+/* Most Popular Badge */
+.tmw-pricing-badge {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--tmw-accent) 0%, var(--tmw-accent-dark) 100%);
+    color: white;
+    font-size: var(--tmw-text-xs);
+    font-weight: var(--tmw-font-bold);
+    padding: var(--tmw-space-2) var(--tmw-space-4);
+    border-radius: var(--tmw-radius-full);
+    white-space: nowrap;
+    box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+}
+
+/* Card Header */
+.tmw-pricing-header {
+    text-align: center;
+    margin-bottom: var(--tmw-space-6);
+    padding-bottom: var(--tmw-space-6);
+    border-bottom: 1px solid var(--tmw-border);
+}
+
+.tmw-pricing-name {
+    font-size: var(--tmw-text-xl);
+    font-weight: var(--tmw-font-bold);
+    margin-bottom: var(--tmw-space-4);
+    color: var(--tmw-text-primary);
+}
+
+.tmw-pricing-price {
+    display: flex;
+    align-items: baseline;
+    justify-content: center;
+    gap: 2px;
+}
+
+.tmw-pricing-currency {
+    font-size: var(--tmw-text-xl);
+    font-weight: var(--tmw-font-medium);
+    color: var(--tmw-text-muted);
+    align-self: flex-start;
+    margin-top: 8px;
+}
+
+.tmw-pricing-amount {
+    font-size: var(--tmw-text-5xl);
+    font-weight: var(--tmw-font-bold);
+    line-height: 1;
+    color: var(--tmw-text-primary);
+}
+
+.tmw-pricing-period {
+    font-size: var(--tmw-text-base);
+    color: var(--tmw-text-muted);
+}
+
+/* Card Features */
+.tmw-pricing-features {
+    flex: 1;
+    margin-bottom: var(--tmw-space-6);
+}
+
+.tmw-pricing-features li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--tmw-space-3);
+    padding: var(--tmw-space-3) 0;
+    font-size: var(--tmw-text-sm);
+    color: var(--tmw-text-secondary);
+    border-bottom: 1px solid var(--tmw-border);
+}
+
+.tmw-pricing-features li:last-child {
+    border-bottom: none;
+}
+
+.tmw-pricing-features li i {
+    flex-shrink: 0;
+    width: 18px;
+    text-align: center;
+    margin-top: 2px;
+}
+
+.tmw-pricing-features li .fa-check {
+    color: var(--tmw-success);
+}
+
+.tmw-pricing-features li .fa-times {
+    color: var(--tmw-text-disabled);
+}
+
+.tmw-pricing-features li.disabled {
+    color: var(--tmw-text-disabled);
+}
+
+/* Feature Badge (Coming Soon) */
+.tmw-feature-badge {
+    font-size: 10px;
+    font-weight: var(--tmw-font-bold);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--tmw-warning);
+    padding: 2px 8px;
+    border-radius: var(--tmw-radius-sm);
+    margin-left: auto;
+}
+
+/* Card Footer */
+.tmw-pricing-footer {
+    margin-top: auto;
+}
+
+.tmw-pricing-current .tmw-pricing-footer .tmw-btn {
+    background-color: var(--tmw-bg-tertiary);
+    border-color: var(--tmw-border);
+    color: var(--tmw-text-muted);
+    cursor: default;
+}
+
 /* ==========================================================================
    PRICING TABLE (Feature Comparison)
    ========================================================================== */
 .tmw-pricing-table-wrap {
     margin-top: var(--tmw-space-12);
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
 }
 
 .tmw-pricing-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     min-width: 600px;
+    background-color: var(--tmw-card-bg);
+    border: 1px solid var(--tmw-border);
+    border-radius: var(--tmw-radius-lg);
+    overflow: hidden;
 }
 
 .tmw-pricing-table th,
 .tmw-pricing-table td {
-    padding: var(--tmw-space-4);
+    padding: var(--tmw-space-4) var(--tmw-space-5);
     text-align: center;
     border-bottom: 1px solid var(--tmw-border);
 }
@@ -35,11 +293,20 @@
 .tmw-pricing-table th {
     background-color: var(--tmw-bg-secondary);
     font-weight: var(--tmw-font-semibold);
+    font-size: var(--tmw-text-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--tmw-text-muted);
 }
 
 .tmw-pricing-table th:first-child,
 .tmw-pricing-table td:first-child {
     text-align: left;
+    font-weight: var(--tmw-font-medium);
+}
+
+.tmw-pricing-table tbody tr:last-child td {
+    border-bottom: none;
 }
 
 .tmw-pricing-table tbody tr:hover {
@@ -48,19 +315,27 @@
 
 .tmw-pricing-table .fa-check {
     color: var(--tmw-success);
+    font-size: var(--tmw-text-lg);
 }
 
 .tmw-pricing-table .fa-times {
     color: var(--tmw-text-disabled);
+    font-size: var(--tmw-text-lg);
 }
 
-.tmw-pricing-table-header {
-    background: linear-gradient(135deg, var(--tmw-accent-light) 0%, transparent 100%);
+.tmw-pricing-table .text-success {
+    color: var(--tmw-success);
 }
 
-.tmw-pricing-table-header.popular {
-    background: linear-gradient(135deg, var(--tmw-accent) 0%, var(--tmw-accent-dark) 100%);
-    color: white;
+.tmw-pricing-table .text-muted {
+    color: var(--tmw-text-disabled);
+}
+
+/* Popular column highlight */
+.tmw-pricing-table-popular {
+    background: linear-gradient(180deg, rgba(56, 189, 248, 0.1) 0%, transparent 100%);
+    color: var(--tmw-accent);
+    font-weight: var(--tmw-font-bold);
 }
 
 /* ==========================================================================
