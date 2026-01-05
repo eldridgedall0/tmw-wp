@@ -1,0 +1,316 @@
+/**
+ * Layout - Containers, Grid, Page Structure
+ *
+ * @package flavor-starter-flavor
+ */
+
+/* ==========================================================================
+   CONTAINER
+   ========================================================================== */
+.tmw-container {
+    width: 100%;
+    max-width: var(--tmw-container-max);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: var(--tmw-space-4);
+    padding-right: var(--tmw-space-4);
+}
+
+.tmw-container-narrow {
+    max-width: var(--tmw-container-narrow);
+}
+
+.tmw-container-full {
+    max-width: none;
+}
+
+/* ==========================================================================
+   PAGE WRAPPER
+   ========================================================================== */
+.tmw-site {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.tmw-main {
+    flex: 1;
+    padding-top: var(--tmw-header-height);
+}
+
+/* Full height pages (auth, etc.) */
+.tmw-main-full {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ==========================================================================
+   SECTIONS
+   ========================================================================== */
+.tmw-section {
+    padding: var(--tmw-space-16) 0;
+}
+
+.tmw-section-sm {
+    padding: var(--tmw-space-8) 0;
+}
+
+.tmw-section-lg {
+    padding: var(--tmw-space-24) 0;
+}
+
+.tmw-section-header {
+    text-align: center;
+    margin-bottom: var(--tmw-space-12);
+}
+
+.tmw-section-title {
+    margin-bottom: var(--tmw-space-4);
+}
+
+.tmw-section-subtitle {
+    color: var(--tmw-text-muted);
+    font-size: var(--tmw-text-lg);
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* ==========================================================================
+   GRID
+   ========================================================================== */
+.tmw-grid {
+    display: grid;
+    gap: var(--tmw-space-6);
+}
+
+.tmw-grid-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.tmw-grid-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.tmw-grid-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* Auto-fit grids */
+.tmw-grid-auto {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+/* ==========================================================================
+   FLEX LAYOUTS
+   ========================================================================== */
+.tmw-flex {
+    display: flex;
+}
+
+.tmw-flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tmw-flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.tmw-flex-col {
+    display: flex;
+    flex-direction: column;
+}
+
+/* ==========================================================================
+   AUTH PAGE LAYOUT
+   ========================================================================== */
+.tmw-auth-page {
+    min-height: calc(100vh - var(--tmw-header-height));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--tmw-space-8) var(--tmw-space-4);
+}
+
+.tmw-auth-container {
+    width: 100%;
+    max-width: 440px;
+}
+
+.tmw-auth-card {
+    background-color: var(--tmw-card-bg);
+    border: 1px solid var(--tmw-card-border);
+    border-radius: var(--tmw-radius-xl);
+    padding: var(--tmw-space-8);
+    box-shadow: var(--tmw-shadow-lg);
+}
+
+.tmw-auth-header {
+    text-align: center;
+    margin-bottom: var(--tmw-space-8);
+}
+
+.tmw-auth-logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: var(--tmw-space-6);
+}
+
+.tmw-auth-logo img {
+    width: 64px;
+    height: 64px;
+}
+
+.tmw-auth-title {
+    font-size: var(--tmw-text-2xl);
+    font-weight: var(--tmw-font-bold);
+    margin-bottom: var(--tmw-space-2);
+}
+
+.tmw-auth-subtitle {
+    color: var(--tmw-text-muted);
+}
+
+.tmw-auth-form {
+    margin-bottom: var(--tmw-space-6);
+}
+
+.tmw-auth-footer {
+    text-align: center;
+    color: var(--tmw-text-muted);
+    font-size: var(--tmw-text-sm);
+}
+
+.tmw-auth-footer a {
+    font-weight: var(--tmw-font-medium);
+}
+
+.tmw-auth-links {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--tmw-space-4);
+    font-size: var(--tmw-text-sm);
+}
+
+/* ==========================================================================
+   SPLIT LAYOUT (for profile, etc.)
+   ========================================================================== */
+.tmw-split-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: var(--tmw-space-8);
+    min-height: calc(100vh - var(--tmw-header-height));
+}
+
+.tmw-split-sidebar {
+    background-color: var(--tmw-bg-secondary);
+    border-right: 1px solid var(--tmw-border);
+    padding: var(--tmw-space-6);
+}
+
+.tmw-split-content {
+    padding: var(--tmw-space-8);
+    max-width: 800px;
+}
+
+/* ==========================================================================
+   CENTERED CONTENT
+   ========================================================================== */
+.tmw-centered {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 400px;
+}
+
+.tmw-centered-icon {
+    font-size: 3rem;
+    color: var(--tmw-text-muted);
+    margin-bottom: var(--tmw-space-4);
+}
+
+/* ==========================================================================
+   BACKGROUND VARIATIONS
+   ========================================================================== */
+.tmw-bg-primary { background-color: var(--tmw-bg-primary); }
+.tmw-bg-secondary { background-color: var(--tmw-bg-secondary); }
+.tmw-bg-tertiary { background-color: var(--tmw-bg-tertiary); }
+.tmw-bg-accent { background-color: var(--tmw-accent-light); }
+
+/* ==========================================================================
+   CONTENT BLOCKS
+   ========================================================================== */
+.tmw-content-block {
+    margin-bottom: var(--tmw-space-8);
+}
+
+.tmw-content-block:last-child {
+    margin-bottom: 0;
+}
+
+.tmw-content-block-title {
+    font-size: var(--tmw-text-lg);
+    font-weight: var(--tmw-font-semibold);
+    margin-bottom: var(--tmw-space-4);
+    padding-bottom: var(--tmw-space-3);
+    border-bottom: 1px solid var(--tmw-border);
+}
+
+/* ==========================================================================
+   STAT GRID
+   ========================================================================== */
+.tmw-stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--tmw-space-4);
+}
+
+.tmw-stat-card {
+    background-color: var(--tmw-card-bg);
+    border: 1px solid var(--tmw-card-border);
+    border-radius: var(--tmw-radius-lg);
+    padding: var(--tmw-space-5);
+}
+
+.tmw-stat-label {
+    font-size: var(--tmw-text-sm);
+    color: var(--tmw-text-muted);
+    margin-bottom: var(--tmw-space-1);
+}
+
+.tmw-stat-value {
+    font-size: var(--tmw-text-2xl);
+    font-weight: var(--tmw-font-bold);
+}
+
+/* ==========================================================================
+   EMPTY STATE
+   ========================================================================== */
+.tmw-empty-state {
+    text-align: center;
+    padding: var(--tmw-space-12) var(--tmw-space-4);
+}
+
+.tmw-empty-icon {
+    font-size: 4rem;
+    color: var(--tmw-text-muted);
+    opacity: 0.5;
+    margin-bottom: var(--tmw-space-4);
+}
+
+.tmw-empty-title {
+    font-size: var(--tmw-text-xl);
+    font-weight: var(--tmw-font-semibold);
+    margin-bottom: var(--tmw-space-2);
+}
+
+.tmw-empty-text {
+    color: var(--tmw-text-muted);
+    margin-bottom: var(--tmw-space-6);
+}

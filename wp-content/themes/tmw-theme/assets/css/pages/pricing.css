@@ -1,0 +1,265 @@
+/**
+ * Pricing Page Styles
+ *
+ * @package flavor-starter-flavor
+ */
+
+/* ==========================================================================
+   PRICING PAGE
+   ========================================================================== */
+.tmw-pricing-page {
+    padding: var(--tmw-space-12) 0;
+}
+
+/* ==========================================================================
+   PRICING TABLE (Feature Comparison)
+   ========================================================================== */
+.tmw-pricing-table-wrap {
+    margin-top: var(--tmw-space-12);
+    overflow-x: auto;
+}
+
+.tmw-pricing-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px;
+}
+
+.tmw-pricing-table th,
+.tmw-pricing-table td {
+    padding: var(--tmw-space-4);
+    text-align: center;
+    border-bottom: 1px solid var(--tmw-border);
+}
+
+.tmw-pricing-table th {
+    background-color: var(--tmw-bg-secondary);
+    font-weight: var(--tmw-font-semibold);
+}
+
+.tmw-pricing-table th:first-child,
+.tmw-pricing-table td:first-child {
+    text-align: left;
+}
+
+.tmw-pricing-table tbody tr:hover {
+    background-color: var(--tmw-bg-secondary);
+}
+
+.tmw-pricing-table .fa-check {
+    color: var(--tmw-success);
+}
+
+.tmw-pricing-table .fa-times {
+    color: var(--tmw-text-disabled);
+}
+
+.tmw-pricing-table-header {
+    background: linear-gradient(135deg, var(--tmw-accent-light) 0%, transparent 100%);
+}
+
+.tmw-pricing-table-header.popular {
+    background: linear-gradient(135deg, var(--tmw-accent) 0%, var(--tmw-accent-dark) 100%);
+    color: white;
+}
+
+/* ==========================================================================
+   RENEWAL PAGE
+   ========================================================================== */
+.tmw-renewal-page {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: var(--tmw-space-8) var(--tmw-space-4);
+}
+
+.tmw-renewal-header {
+    text-align: center;
+    margin-bottom: var(--tmw-space-8);
+}
+
+.tmw-renewal-current {
+    background-color: var(--tmw-bg-secondary);
+    border: 1px solid var(--tmw-border);
+    border-radius: var(--tmw-radius-lg);
+    padding: var(--tmw-space-6);
+    margin-bottom: var(--tmw-space-8);
+}
+
+.tmw-renewal-current-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--tmw-space-4);
+}
+
+.tmw-renewal-current-tier {
+    font-size: var(--tmw-text-xl);
+    font-weight: var(--tmw-font-semibold);
+}
+
+.tmw-renewal-options {
+    display: grid;
+    gap: var(--tmw-space-4);
+}
+
+.tmw-renewal-option {
+    display: flex;
+    align-items: center;
+    gap: var(--tmw-space-4);
+    padding: var(--tmw-space-5);
+    background-color: var(--tmw-card-bg);
+    border: 2px solid var(--tmw-border);
+    border-radius: var(--tmw-radius-lg);
+    cursor: pointer;
+    transition: all var(--tmw-transition-fast);
+}
+
+.tmw-renewal-option:hover {
+    border-color: var(--tmw-accent);
+}
+
+.tmw-renewal-option.selected {
+    border-color: var(--tmw-accent);
+    background-color: var(--tmw-accent-light);
+}
+
+.tmw-renewal-option input {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--tmw-accent);
+}
+
+.tmw-renewal-option-content {
+    flex: 1;
+}
+
+.tmw-renewal-option-name {
+    font-weight: var(--tmw-font-semibold);
+    margin-bottom: var(--tmw-space-1);
+}
+
+.tmw-renewal-option-desc {
+    font-size: var(--tmw-text-sm);
+    color: var(--tmw-text-muted);
+}
+
+.tmw-renewal-option-price {
+    text-align: right;
+}
+
+.tmw-renewal-option-amount {
+    font-size: var(--tmw-text-xl);
+    font-weight: var(--tmw-font-bold);
+}
+
+.tmw-renewal-option-period {
+    font-size: var(--tmw-text-sm);
+    color: var(--tmw-text-muted);
+}
+
+/* ==========================================================================
+   FAQ SECTION
+   ========================================================================== */
+.tmw-faq-section {
+    margin-top: var(--tmw-space-16);
+}
+
+.tmw-faq-list {
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.tmw-faq-item {
+    border-bottom: 1px solid var(--tmw-border);
+}
+
+.tmw-faq-question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: var(--tmw-space-5) 0;
+    text-align: left;
+    font-size: var(--tmw-text-base);
+    font-weight: var(--tmw-font-medium);
+    color: var(--tmw-text-primary);
+    transition: color var(--tmw-transition-fast);
+}
+
+.tmw-faq-question:hover {
+    color: var(--tmw-accent);
+}
+
+.tmw-faq-question i {
+    transition: transform var(--tmw-transition-fast);
+}
+
+.tmw-faq-item.is-open .tmw-faq-question i {
+    transform: rotate(180deg);
+}
+
+.tmw-faq-answer {
+    display: none;
+    padding-bottom: var(--tmw-space-5);
+    color: var(--tmw-text-secondary);
+    line-height: var(--tmw-leading-relaxed);
+}
+
+.tmw-faq-item.is-open .tmw-faq-answer {
+    display: block;
+}
+
+/* ==========================================================================
+   GUARANTEE SECTION
+   ========================================================================== */
+.tmw-guarantee {
+    text-align: center;
+    padding: var(--tmw-space-8);
+    background-color: var(--tmw-bg-secondary);
+    border: 1px solid var(--tmw-border);
+    border-radius: var(--tmw-radius-xl);
+    margin-top: var(--tmw-space-12);
+}
+
+.tmw-guarantee-icon {
+    font-size: 3rem;
+    color: var(--tmw-success);
+    margin-bottom: var(--tmw-space-4);
+}
+
+.tmw-guarantee-title {
+    font-size: var(--tmw-text-xl);
+    font-weight: var(--tmw-font-semibold);
+    margin-bottom: var(--tmw-space-2);
+}
+
+.tmw-guarantee-text {
+    color: var(--tmw-text-muted);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+/* ==========================================================================
+   RESPONSIVE PRICING
+   ========================================================================== */
+@media (max-width: 767px) {
+    .tmw-pricing-page {
+        padding: var(--tmw-space-8) 0;
+    }
+
+    .tmw-renewal-current-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--tmw-space-2);
+    }
+
+    .tmw-renewal-option {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .tmw-renewal-option-price {
+        text-align: left;
+        margin-top: var(--tmw-space-2);
+    }
+}
