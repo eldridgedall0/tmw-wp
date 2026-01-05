@@ -256,85 +256,83 @@ function tmw_get_user_subscription_data($user_id = 0) {
  * @return array Feature comparison
  */
 function tmw_get_feature_comparison() {
-    $tiers = array('free', 'paid', 'fleet');
-    $comparison = array();
+    $free_limits = tmw_get_tier_limits('free');
+    $paid_limits = tmw_get_tier_limits('paid');
+    $fleet_limits = tmw_get_tier_limits('fleet');
 
-    $features = array(
-        'max_vehicles' => array(
-            'label' => __('Vehicles', 'flavor-starter-flavor'),
-            'type'  => 'number',
+    // Helper to format number values
+    $format_number = function($val) {
+        return $val === -1 ? __('Unlimited', 'flavor-starter-flavor') : $val;
+    };
+
+    // Helper to format export level
+    $format_export = function($val) {
+        $labels = array(
+            'none'     => false,
+            'basic'    => __('CSV & PDF', 'flavor-starter-flavor'),
+            'standard' => __('CSV & PDF', 'flavor-starter-flavor'),
+            'advanced' => __('CSV, PDF & Bulk', 'flavor-starter-flavor'),
+            'bulk'     => __('CSV, PDF & Bulk', 'flavor-starter-flavor'),
+        );
+        return isset($labels[$val]) ? $labels[$val] : $val;
+    };
+
+    return array(
+        array(
+            'name'  => __('Vehicles', 'flavor-starter-flavor'),
+            'free'  => $format_number($free_limits['max_vehicles']),
+            'paid'  => $format_number($paid_limits['max_vehicles']),
+            'fleet' => $format_number($fleet_limits['max_vehicles']),
         ),
-        'max_entries' => array(
-            'label' => __('Service Entries', 'flavor-starter-flavor'),
-            'type'  => 'number',
+        array(
+            'name'  => __('Service Entries', 'flavor-starter-flavor'),
+            'free'  => $format_number($free_limits['max_entries']),
+            'paid'  => $format_number($paid_limits['max_entries']),
+            'fleet' => $format_number($fleet_limits['max_entries']),
         ),
-        'attachments_per_entry' => array(
-            'label' => __('Attachments per Entry', 'flavor-starter-flavor'),
-            'type'  => 'number',
+        array(
+            'name'  => __('Attachments per Entry', 'flavor-starter-flavor'),
+            'free'  => $free_limits['attachments_per_entry'] > 0 ? $free_limits['attachments_per_entry'] : __('None', 'flavor-starter-flavor'),
+            'paid'  => $paid_limits['attachments_per_entry'],
+            'fleet' => $fleet_limits['attachments_per_entry'],
         ),
-        'recalls_enabled' => array(
-            'label' => __('Recall Alerts', 'flavor-starter-flavor'),
-            'type'  => 'boolean',
+        array(
+            'name'  => __('Recall Alerts', 'flavor-starter-flavor'),
+            'free'  => (bool) $free_limits['recalls_enabled'],
+            'paid'  => (bool) $paid_limits['recalls_enabled'],
+            'fleet' => (bool) $fleet_limits['recalls_enabled'],
         ),
-        'export_level' => array(
-            'label' => __('Export Reports', 'flavor-starter-flavor'),
-            'type'  => 'export',
+        array(
+            'name'  => __('Export Reports', 'flavor-starter-flavor'),
+            'free'  => $format_export($free_limits['export_level']),
+            'paid'  => $format_export($paid_limits['export_level']),
+            'fleet' => $format_export($fleet_limits['export_level']),
         ),
-        'max_templates' => array(
-            'label' => __('Service Templates', 'flavor-starter-flavor'),
-            'type'  => 'number',
+        array(
+            'name'  => __('Service Templates', 'flavor-starter-flavor'),
+            'free'  => $format_number($free_limits['max_templates']),
+            'paid'  => $format_number($paid_limits['max_templates']),
+            'fleet' => $format_number($fleet_limits['max_templates']),
         ),
-        'vehicle_photos' => array(
-            'label' => __('Vehicle Photos', 'flavor-starter-flavor'),
-            'type'  => 'boolean',
+        array(
+            'name'  => __('Vehicle Photos', 'flavor-starter-flavor'),
+            'free'  => (bool) $free_limits['vehicle_photos'],
+            'paid'  => (bool) $paid_limits['vehicle_photos'],
+            'fleet' => (bool) $fleet_limits['vehicle_photos'],
         ),
-        'api_access' => array(
-            'label' => __('API Access', 'flavor-starter-flavor'),
-            'type'  => 'boolean',
+        array(
+            'name'  => __('API Access', 'flavor-starter-flavor'),
+            'free'  => (bool) $free_limits['api_access'],
+            'paid'  => (bool) $paid_limits['api_access'],
+            'fleet' => (bool) $fleet_limits['api_access'],
         ),
-        'team_members' => array(
-            'label' => __('Team Members', 'flavor-starter-flavor'),
-            'type'  => 'team',
+        array(
+            'name'  => __('Team Members', 'flavor-starter-flavor'),
+            'free'  => $free_limits['team_members'] > 0 ? $free_limits['team_members'] : __('—', 'flavor-starter-flavor'),
+            'paid'  => $paid_limits['team_members'] > 0 ? $paid_limits['team_members'] : __('—', 'flavor-starter-flavor'),
+            'fleet' => $fleet_limits['team_members'] > 0 ? sprintf(__('Up to %d', 'flavor-starter-flavor'), $fleet_limits['team_members']) . ' <span class="tmw-feature-badge">' . __('Soon', 'flavor-starter-flavor') . '</span>' : __('—', 'flavor-starter-flavor'),
         ),
     );
-
-    foreach ($features as $key => $feature) {
-        $row = array(
-            'key'   => $key,
-            'label' => $feature['label'],
-            'type'  => $feature['type'],
-            'values' => array(),
-        );
-
-        foreach ($tiers as $tier) {
-            $limits = tmw_get_tier_limits($tier);
-            $value = isset($limits[$key]) ? $limits[$key] : null;
-            
-            // Format the value for display
-            if ($feature['type'] === 'number') {
-                $row['values'][$tier] = $value === -1 ? __('Unlimited', 'flavor-starter-flavor') : $value;
-            } elseif ($feature['type'] === 'boolean') {
-                $row['values'][$tier] = $value;
-            } elseif ($feature['type'] === 'export') {
-                $labels = array(
-                    'none'     => __('—', 'flavor-starter-flavor'),
-                    'basic'    => __('CSV / PDF', 'flavor-starter-flavor'),
-                    'advanced' => __('CSV / PDF + Bulk', 'flavor-starter-flavor'),
-                );
-                $row['values'][$tier] = isset($labels[$value]) ? $labels[$value] : $value;
-            } elseif ($feature['type'] === 'team') {
-                if ($tier === 'fleet' && $value > 0) {
-                    $row['values'][$tier] = sprintf(__('Up to %d (Coming Soon)', 'flavor-starter-flavor'), $value);
-                } else {
-                    $row['values'][$tier] = $value > 0 ? $value : __('—', 'flavor-starter-flavor');
-                }
-            }
-        }
-
-        $comparison[] = $row;
-    }
-
-    return $comparison;
 }
 
 // =============================================================================
