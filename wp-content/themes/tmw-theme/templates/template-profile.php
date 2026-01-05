@@ -14,6 +14,10 @@ if (!is_user_logged_in()) {
 
 $user = wp_get_current_user();
 $subscription = tmw_get_user_subscription_data($user->ID);
+$is_free = tmw_is_free_membership($user->ID);
+
+// Get actual level name from Simple Membership
+$level_name = tmw_get_swpm_level_name($user->ID);
 
 get_header();
 ?>
@@ -45,16 +49,18 @@ get_header();
             <div class="tmw-subscription-card">
                 <div class="tmw-subscription-header">
                     <span class="tmw-subscription-tier">
-                        <?php echo esc_html(tmw_get_tier_name($subscription['tier'])); ?> <?php _e('Plan', 'flavor-starter-flavor'); ?>
+                        <?php echo esc_html($level_name); ?>
                     </span>
-                    <span class="tmw-subscription-status <?php echo $subscription['is_active'] ? '' : 'inactive'; ?>">
-                        <i class="fas fa-<?php echo $subscription['is_active'] ? 'check-circle' : 'times-circle'; ?>"></i>
-                        <?php echo $subscription['is_active'] ? __('Active', 'flavor-starter-flavor') : __('Inactive', 'flavor-starter-flavor'); ?>
-                    </span>
+                    <?php if (!$is_free) : ?>
+                        <span class="tmw-subscription-status <?php echo $subscription['is_active'] ? 'active' : 'inactive'; ?>">
+                            <i class="fas fa-<?php echo $subscription['is_active'] ? 'check-circle' : 'times-circle'; ?>"></i>
+                            <?php echo $subscription['is_active'] ? __('Active', 'flavor-starter-flavor') : __('Inactive', 'flavor-starter-flavor'); ?>
+                        </span>
+                    <?php endif; ?>
                 </div>
 
                 <div class="tmw-subscription-details">
-                    <?php if ($subscription['tier'] !== 'free' && $subscription['expiry_date']) : ?>
+                    <?php if (!$is_free && !empty($subscription['expiry_date'])) : ?>
                         <div class="tmw-subscription-detail">
                             <div class="tmw-subscription-detail-label"><?php _e('Renewal Date', 'flavor-starter-flavor'); ?></div>
                             <div><?php echo date_i18n(get_option('date_format'), strtotime($subscription['expiry_date'])); ?></div>
@@ -68,13 +74,13 @@ get_header();
                 </div>
 
                 <div class="tmw-subscription-actions">
-                    <?php if ($subscription['tier'] === 'free') : ?>
+                    <?php if ($is_free) : ?>
                         <a href="<?php echo esc_url(tmw_get_page_url('pricing')); ?>" class="tmw-btn tmw-btn-primary">
                             <i class="fas fa-arrow-up"></i>
                             <?php _e('Upgrade Plan', 'flavor-starter-flavor'); ?>
                         </a>
                     <?php else : ?>
-                        <a href="<?php echo esc_url(tmw_get_page_url('renewal')); ?>" class="tmw-btn tmw-btn-secondary">
+                        <a href="<?php echo esc_url(tmw_get_swpm_profile_url()); ?>" class="tmw-btn tmw-btn-secondary">
                             <?php _e('Manage Subscription', 'flavor-starter-flavor'); ?>
                         </a>
                     <?php endif; ?>
