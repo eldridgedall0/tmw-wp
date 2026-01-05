@@ -17,7 +17,7 @@ if (!defined('ABSPATH')) {
 // =============================================================================
 // BLOCK WP-ADMIN ACCESS FOR NON-ADMINS
 // =============================================================================
-add_action('admin_init', 'tmw_block_wp_admin', 1);
+// add_action('admin_init', 'tmw_block_wp_admin', 1);
 
 function tmw_block_wp_admin() {
     // Allow AJAX requests
@@ -46,8 +46,8 @@ function tmw_block_wp_admin() {
         $redirect = home_url('/');
     }
 
-    // wp_safe_redirect($redirect);
-    // exit;
+    wp_safe_redirect($redirect);
+    exit;
 }
 
 // =============================================================================
