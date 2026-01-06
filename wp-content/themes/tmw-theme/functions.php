@@ -109,14 +109,6 @@ function tmw_get_subscription_setting($key, $default = '') {
 }
 
 /**
- * Get level mapping settings
- */
-function tmw_get_level_mapping($key, $default = 0) {
-    $mapping = get_option('tmw_level_mapping', array());
-    return isset($mapping[$key]) ? (int) $mapping[$key] : $default;
-}
-
-/**
  * Get current theme mode (dark/light)
  */
 function tmw_get_theme_mode() {
