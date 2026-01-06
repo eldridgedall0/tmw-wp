@@ -114,33 +114,6 @@ function tmw_get_membership_adapter() {
 // =============================================================================
 
 /**
- * Map a membership level ID to our tier names
- *
- * @param int|string $level_id The plugin's level ID
- * @return string Tier name
- */
-function tmw_map_level_to_tier($level_id) {
-    $mapping = get_option('tmw_level_mapping', array());
-    
-    $free_id = isset($mapping['free_level_id']) ? (int) $mapping['free_level_id'] : 1;
-    $paid_id = isset($mapping['paid_level_id']) ? (int) $mapping['paid_level_id'] : 2;
-    $fleet_id = isset($mapping['fleet_level_id']) ? (int) $mapping['fleet_level_id'] : 3;
-    $fallback = isset($mapping['fallback_tier']) ? $mapping['fallback_tier'] : 'free';
-
-    $level_id = (int) $level_id;
-
-    if ($level_id === $free_id) {
-        return 'free';
-    } elseif ($level_id === $paid_id) {
-        return 'paid';
-    } elseif ($level_id === $fleet_id) {
-        return 'fleet';
-    }
-
-    return $fallback;
-}
-
-/**
  * Map tier name to level ID (reverse lookup)
  *
  * @param string $tier Tier name
