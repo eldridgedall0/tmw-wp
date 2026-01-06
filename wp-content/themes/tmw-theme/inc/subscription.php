@@ -1,9 +1,10 @@
 <?php
 /**
- * Subscription Tier Logic
+ * Subscription Tier Logic - Dynamic System
  *
  * Handles subscription tier detection and limit enforcement.
  * Works with the membership adapter pattern for plugin flexibility.
+ * Includes GarageMinder API functions for the app.
  *
  * @package flavor-starter-flavor
  */
@@ -17,10 +18,10 @@ if (!defined('ABSPATH')) {
 // =============================================================================
 
 /**
- * Get the subscription tier for a user
+ * Get the subscription tier slug for a user
  *
  * @param int $user_id User ID (defaults to current user)
- * @return string Tier name: 'free', 'paid', 'fleet', or 'none'
+ * @return string Tier slug (e.g., 'free', 'paid', 'fleet') or 'none'
  */
 function tmw_get_user_tier($user_id = 0) {
     if (!$user_id) {
@@ -40,7 +41,33 @@ function tmw_get_user_tier($user_id = 0) {
 
     // Fallback to user meta
     $tier = get_user_meta($user_id, 'tmw_subscription_tier', true);
-    return $tier ? $tier : tmw_get_level_mapping('fallback_tier', 'free');
+    $tiers = tmw_get_tiers();
+    
+    // Validate tier exists
+    if ($tier && isset($tiers[$tier])) {
+        return $tier;
+    }
+    
+    // Return first free tier as fallback
+    foreach ($tiers as $slug => $t) {
+        if (!empty($t['is_free'])) {
+            return $slug;
+        }
+    }
+    
+    return array_key_first($tiers) ?: 'free';
+}
+
+/**
+ * Get user's tier ID (SWPM level ID)
+ *
+ * @param int $user_id User ID
+ * @return int Tier ID (SWPM level ID)
+ */
+function tmw_get_user_tier_id($user_id = 0) {
+    $tier_slug = tmw_get_user_tier($user_id);
+    $tier = tmw_get_tier($tier_slug);
+    return $tier ? (int) ($tier['swpm_level_id'] ?? 0) : 0;
 }
 
 /**
@@ -56,6 +83,11 @@ function tmw_user_has_active_subscription($user_id = 0) {
 
     if (!$user_id) {
         return false;
+    }
+
+    // Free tiers are always "active"
+    if (tmw_is_free_membership($user_id)) {
+        return true;
     }
 
     $adapter = tmw_get_membership_adapter();
@@ -80,10 +112,6 @@ function tmw_get_subscription_expiry($user_id = 0) {
         $user_id = get_current_user_id();
     }
 
-    if (!$user_id) {
-        return null;
-    }
-
     $adapter = tmw_get_membership_adapter();
     
     if ($adapter) {
@@ -93,37 +121,42 @@ function tmw_get_subscription_expiry($user_id = 0) {
     return get_user_meta($user_id, 'tmw_subscription_expiry', true) ?: null;
 }
 
+/**
+ * Check if user is on a free/no-cost membership
+ *
+ * @param int $user_id User ID
+ * @return bool
+ */
+function tmw_is_free_membership($user_id = 0) {
+    if (!$user_id) {
+        $user_id = get_current_user_id();
+    }
+
+    $tier_slug = tmw_get_user_tier($user_id);
+    $tier = tmw_get_tier($tier_slug);
+    
+    return $tier ? !empty($tier['is_free']) : true;
+}
+
 // =============================================================================
-// GET TIER LIMITS
+// GET TIER LIMITS (Dynamic)
 // =============================================================================
 
 /**
  * Get all limits for a specific tier
  *
- * @param string $tier Tier name (free, paid, fleet)
+ * @param string $tier Tier slug
  * @return array Limits array
  */
 function tmw_get_tier_limits($tier = 'free') {
-    $settings = get_option('tmw_subscription_settings', array());
-    $defaults = tmw_get_default_subscription_settings();
-    $settings = wp_parse_args($settings, $defaults);
-
-    $valid_tiers = array('free', 'paid', 'fleet');
-    if (!in_array($tier, $valid_tiers)) {
-        $tier = 'free';
+    $values = tmw_get_tier_values();
+    
+    if (isset($values[$tier])) {
+        return $values[$tier];
     }
-
-    return array(
-        'max_vehicles'          => (int) $settings[$tier . '_max_vehicles'],
-        'max_entries'           => (int) $settings[$tier . '_max_entries'],
-        'attachments_per_entry' => (int) $settings[$tier . '_attachments_per_entry'],
-        'recalls_enabled'       => (bool) $settings[$tier . '_recalls_enabled'],
-        'export_level'          => $settings[$tier . '_export_level'],
-        'max_templates'         => (int) $settings[$tier . '_max_templates'],
-        'vehicle_photos'        => (bool) $settings[$tier . '_vehicle_photos'],
-        'api_access'            => (bool) $settings[$tier . '_api_access'],
-        'team_members'          => (int) $settings[$tier . '_team_members'],
-    );
+    
+    // Return first tier's values as fallback
+    return reset($values) ?: array();
 }
 
 /**
@@ -140,9 +173,9 @@ function tmw_get_user_limits($user_id = 0) {
 /**
  * Check if a specific feature is allowed for user
  *
- * @param string $feature Feature key
+ * @param string $feature Feature/limit key
  * @param int $user_id Optional user ID
- * @return bool|int Boolean for toggles, int for limits (-1 = unlimited)
+ * @return mixed Boolean for toggles, int for limits (-1 = unlimited)
  */
 function tmw_user_can($feature, $user_id = 0) {
     $limits = tmw_get_user_limits($user_id);
@@ -154,44 +187,65 @@ function tmw_user_can($feature, $user_id = 0) {
     return false;
 }
 
+/**
+ * Get a specific limit value for user
+ *
+ * @param int $user_id User ID
+ * @param string $limit_key Limit key
+ * @return mixed Limit value
+ */
+function tmw_get_user_limit($user_id, $limit_key) {
+    $tier = tmw_get_user_tier($user_id);
+    return tmw_get_tier_value($tier, $limit_key);
+}
+
 // =============================================================================
-// TIER DISPLAY HELPERS
+// TIER DISPLAY HELPERS (Dynamic)
 // =============================================================================
 
 /**
  * Get tier display name
  *
- * @param string $tier Tier slug
+ * @param string $tier_slug Tier slug
  * @return string Display name
  */
-function tmw_get_tier_name($tier) {
-    $names = array(
-        'free'  => __('Free', 'flavor-starter-flavor'),
-        'paid'  => __('Paid', 'flavor-starter-flavor'),
-        'fleet' => __('Fleet', 'flavor-starter-flavor'),
-        'none'  => __('No Subscription', 'flavor-starter-flavor'),
-    );
-
-    return isset($names[$tier]) ? $names[$tier] : ucfirst($tier);
+function tmw_get_tier_name($tier_slug) {
+    if ($tier_slug === 'none') {
+        return __('No Subscription', 'flavor-starter-flavor');
+    }
+    
+    $tier = tmw_get_tier($tier_slug);
+    
+    if ($tier && !empty($tier['name'])) {
+        return $tier['name'];
+    }
+    
+    return ucfirst($tier_slug);
 }
 
 /**
  * Get tier badge HTML
  *
- * @param string $tier Tier slug
+ * @param string $tier_slug Tier slug
  * @return string HTML badge
  */
-function tmw_get_tier_badge($tier) {
-    $name = tmw_get_tier_name($tier);
-    $class = 'tmw-badge tmw-badge-' . esc_attr($tier);
+function tmw_get_tier_badge($tier_slug) {
+    $tier = tmw_get_tier($tier_slug);
+    $name = tmw_get_tier_name($tier_slug);
+    $color = $tier ? ($tier['color'] ?? '#6b7280') : '#6b7280';
     
-    return '<span class="' . $class . '">' . esc_html($name) . '</span>';
+    return sprintf(
+        '<span class="tmw-badge tmw-badge-%s" style="background:%s;color:#fff;">%s</span>',
+        esc_attr($tier_slug),
+        esc_attr($color),
+        esc_html($name)
+    );
 }
 
 /**
  * Get upgrade URL based on current tier
  *
- * @param string $current_tier Current tier
+ * @param string $current_tier Current tier slug
  * @return string Upgrade URL
  */
 function tmw_get_upgrade_url($current_tier = null) {
@@ -200,56 +254,170 @@ function tmw_get_upgrade_url($current_tier = null) {
     }
 
     $pricing_page = tmw_get_page_url('pricing');
-    
-    if ($current_tier === 'free') {
-        return add_query_arg('upgrade', 'paid', $pricing_page);
-    } elseif ($current_tier === 'paid') {
-        return add_query_arg('upgrade', 'fleet', $pricing_page);
-    }
-
-    return $pricing_page;
+    return add_query_arg('upgrade', $current_tier, $pricing_page);
 }
 
+// =============================================================================
+// GARAGEMINDER API FUNCTIONS
+// These functions are designed for use in the GarageMinder app
+// =============================================================================
+
 /**
- * Check if user is on a free/no-cost membership level
+ * Check if user is on a specific tier by SWPM level ID
  *
- * @param int $user_id
- * @return bool
+ * @param int $user_id WordPress user ID
+ * @param int $tier_id SWPM level ID to check
+ * @return bool True if user is on this tier
  */
-if (!function_exists('tmw_is_free_membership')) {
-    function tmw_is_free_membership($user_id = 0) {
-        if (!$user_id) {
-            $user_id = get_current_user_id();
-        }
+function gm_has_subscription($user_id, $tier_id) {
+    $user_tier_id = tmw_get_user_tier_id($user_id);
+    return $user_tier_id === (int) $tier_id;
+}
 
-        $tier = tmw_get_user_tier($user_id);
+/**
+ * Check if user is on a specific tier by slug
+ *
+ * @param int $user_id WordPress user ID
+ * @param string $tier_slug Tier slug (e.g., 'free', 'paid', 'fleet')
+ * @return bool True if user is on this tier
+ */
+function gm_is_tier($user_id, $tier_slug) {
+    return tmw_get_user_tier($user_id) === $tier_slug;
+}
+
+/**
+ * Check if user is on a tier at or above the specified level
+ *
+ * @param int $user_id WordPress user ID
+ * @param string $min_tier_slug Minimum tier slug required
+ * @return bool True if user meets or exceeds this tier
+ */
+function gm_has_tier_or_higher($user_id, $min_tier_slug) {
+    $tiers = tmw_get_tiers();
+    $user_tier = tmw_get_user_tier($user_id);
+    
+    $min_order = isset($tiers[$min_tier_slug]) ? ($tiers[$min_tier_slug]['order'] ?? 99) : 99;
+    $user_order = isset($tiers[$user_tier]) ? ($tiers[$user_tier]['order'] ?? 0) : 0;
+    
+    return $user_order >= $min_order;
+}
+
+/**
+ * Get user's tier ID (SWPM level ID)
+ *
+ * @param int $user_id WordPress user ID
+ * @return int SWPM level ID
+ */
+function gm_get_user_tier_id($user_id) {
+    return tmw_get_user_tier_id($user_id);
+}
+
+/**
+ * Get user's tier slug
+ *
+ * @param int $user_id WordPress user ID
+ * @return string Tier slug
+ */
+function gm_get_user_tier($user_id) {
+    return tmw_get_user_tier($user_id);
+}
+
+/**
+ * Get a specific limit value for user
+ *
+ * @param int $user_id WordPress user ID
+ * @param string $limit_key Limit key (e.g., 'max_vehicles', 'recalls_enabled')
+ * @return mixed Limit value (int, bool, or string depending on limit type)
+ */
+function gm_get_limit($user_id, $limit_key) {
+    return tmw_get_user_limit($user_id, $limit_key);
+}
+
+/**
+ * Check if user can add more items (numeric limit check)
+ *
+ * @param int $user_id WordPress user ID
+ * @param string $limit_key Limit key (e.g., 'max_vehicles', 'max_entries')
+ * @param int $current_count Current count of items
+ * @return bool True if user can add more
+ */
+function gm_can_add($user_id, $limit_key, $current_count) {
+    $max = gm_get_limit($user_id, $limit_key);
+    
+    // -1 means unlimited
+    if ($max === -1 || $max === '-1') {
+        return true;
+    }
+    
+    return (int) $current_count < (int) $max;
+}
+
+/**
+ * Check if user has access to a feature (boolean or non-zero check)
+ *
+ * @param int $user_id WordPress user ID
+ * @param string $limit_key Limit key
+ * @return bool True if feature is enabled/available
+ */
+function gm_has_feature($user_id, $limit_key) {
+    $value = gm_get_limit($user_id, $limit_key);
+    
+    // Boolean check
+    if (is_bool($value)) {
+        return $value;
+    }
+    
+    // Numeric check (> 0 or -1 for unlimited)
+    if (is_numeric($value)) {
+        return (int) $value > 0 || (int) $value === -1;
+    }
+    
+    // String check (not empty, not 'none', not '0')
+    return !empty($value) && $value !== 'none' && $value !== '0';
+}
+
+/**
+ * Get all limits for user's tier
+ *
+ * @param int $user_id WordPress user ID
+ * @return array All limits as key => value pairs
+ */
+function gm_get_user_limits($user_id) {
+    return tmw_get_user_limits($user_id);
+}
+
+/**
+ * Format limit value for display
+ *
+ * @param mixed $value Limit value
+ * @param string $type Limit type ('number', 'boolean', 'select')
+ * @return string Formatted display string
+ */
+function gm_format_limit($value, $type = 'number') {
+    switch ($type) {
+        case 'boolean':
+            return $value ? __('Yes', 'flavor-starter-flavor') : __('No', 'flavor-starter-flavor');
         
-        // Free tier is always free
-        if ($tier === 'free' || $tier === 'none') {
-            return true;
-        }
-
-        // Check the mapped level ID
-        $adapter = tmw_get_membership_adapter();
-        if ($adapter && method_exists($adapter, 'get_level_id')) {
-            $level_id = $adapter->get_level_id($user_id);
-            $free_level_id = tmw_get_level_mapping('free_level_id');
-            
-            if ($level_id && $free_level_id && $level_id == $free_level_id) {
-                return true;
+        case 'number':
+            if ($value === -1 || $value === '-1') {
+                return __('Unlimited', 'flavor-starter-flavor');
             }
-        }
-
-        return false;
+            return (string) $value;
+        
+        case 'select':
+            return ucfirst($value);
+        
+        default:
+            return (string) $value;
     }
 }
 
 // =============================================================================
-// SUBSCRIPTION DATA FOR REST API / APP
+// SUBSCRIPTION DATA FOR REST API
 // =============================================================================
 
 /**
- * Get complete subscription data for a user (used by REST API)
+ * Get complete subscription data for a user
  *
  * @param int $user_id User ID
  * @return array Subscription data
@@ -262,38 +430,34 @@ function tmw_get_user_subscription_data($user_id = 0) {
     if (!$user_id) {
         return array(
             'tier'        => 'none',
+            'tier_id'     => 0,
             'tier_name'   => tmw_get_tier_name('none'),
             'is_active'   => false,
-            'active'      => false, // Alias for compatibility
-            'limits'      => tmw_get_tier_limits('free'),
+            'is_free'     => true,
+            'limits'      => array(),
             'expiry_date' => null,
-            'expires'     => null, // Alias for compatibility
-            'upgrade_url' => tmw_get_upgrade_url('none'),
         );
     }
 
-    $tier = tmw_get_user_tier($user_id);
-    $is_free = tmw_is_free_membership($user_id);
-    
-    // For free tier, always consider active (no subscription to expire)
+    $tier_slug = tmw_get_user_tier($user_id);
+    $tier = tmw_get_tier($tier_slug);
+    $is_free = $tier ? !empty($tier['is_free']) : true;
     $is_active = $is_free ? true : tmw_user_has_active_subscription($user_id);
-    $expiry_date = tmw_get_subscription_expiry($user_id);
     
     return array(
-        'tier'        => $tier,
-        'tier_name'   => tmw_get_tier_name($tier),
+        'tier'        => $tier_slug,
+        'tier_id'     => $tier ? (int) ($tier['swpm_level_id'] ?? 0) : 0,
+        'tier_name'   => tmw_get_tier_name($tier_slug),
         'is_active'   => $is_active,
-        'active'      => $is_active, // Alias for compatibility
         'is_free'     => $is_free,
-        'limits'      => tmw_get_tier_limits($tier),
-        'expiry_date' => $expiry_date,
-        'expires'     => $expiry_date, // Alias for compatibility
-        'upgrade_url' => tmw_get_upgrade_url($tier),
+        'limits'      => tmw_get_tier_limits($tier_slug),
+        'expiry_date' => $is_free ? null : tmw_get_subscription_expiry($user_id),
+        'upgrade_url' => tmw_get_upgrade_url($tier_slug),
     );
 }
 
 // =============================================================================
-// FEATURE COMPARISON DATA
+// FEATURE COMPARISON DATA (for pricing page)
 // =============================================================================
 
 /**
@@ -302,83 +466,131 @@ function tmw_get_user_subscription_data($user_id = 0) {
  * @return array Feature comparison
  */
 function tmw_get_feature_comparison() {
-    $free_limits = tmw_get_tier_limits('free');
-    $paid_limits = tmw_get_tier_limits('paid');
-    $fleet_limits = tmw_get_tier_limits('fleet');
-
-    // Helper to format number values
-    $format_number = function($val) {
-        return $val === -1 ? __('Unlimited', 'flavor-starter-flavor') : $val;
-    };
-
-    // Helper to format export level
-    $format_export = function($val) {
-        $labels = array(
-            'none'     => false,
-            'basic'    => __('CSV & PDF', 'flavor-starter-flavor'),
-            'standard' => __('CSV & PDF', 'flavor-starter-flavor'),
-            'advanced' => __('CSV, PDF & Bulk', 'flavor-starter-flavor'),
-            'bulk'     => __('CSV, PDF & Bulk', 'flavor-starter-flavor'),
+    $tiers = tmw_get_tiers();
+    $limits = tmw_get_limit_definitions();
+    $values = tmw_get_tier_values();
+    
+    $comparison = array();
+    
+    foreach ($limits as $key => $limit) {
+        $row = array(
+            'name' => $limit['label'],
+            'description' => $limit['description'] ?? '',
+            'type' => $limit['type'],
         );
-        return isset($labels[$val]) ? $labels[$val] : $val;
-    };
+        
+        foreach ($tiers as $tier_slug => $tier) {
+            $value = $values[$tier_slug][$key] ?? null;
+            $row[$tier_slug] = gm_format_limit($value, $limit['type']);
+        }
+        
+        $comparison[] = $row;
+    }
+    
+    return $comparison;
+}
 
-    return array(
-        array(
-            'name'  => __('Vehicles', 'flavor-starter-flavor'),
-            'free'  => $format_number($free_limits['max_vehicles']),
-            'paid'  => $format_number($paid_limits['max_vehicles']),
-            'fleet' => $format_number($fleet_limits['max_vehicles']),
-        ),
-        array(
-            'name'  => __('Service Entries', 'flavor-starter-flavor'),
-            'free'  => $format_number($free_limits['max_entries']),
-            'paid'  => $format_number($paid_limits['max_entries']),
-            'fleet' => $format_number($fleet_limits['max_entries']),
-        ),
-        array(
-            'name'  => __('Attachments per Entry', 'flavor-starter-flavor'),
-            'free'  => $free_limits['attachments_per_entry'] > 0 ? $free_limits['attachments_per_entry'] : __('None', 'flavor-starter-flavor'),
-            'paid'  => $paid_limits['attachments_per_entry'],
-            'fleet' => $fleet_limits['attachments_per_entry'],
-        ),
-        array(
-            'name'  => __('Recall Alerts', 'flavor-starter-flavor'),
-            'free'  => (bool) $free_limits['recalls_enabled'],
-            'paid'  => (bool) $paid_limits['recalls_enabled'],
-            'fleet' => (bool) $fleet_limits['recalls_enabled'],
-        ),
-        array(
-            'name'  => __('Export Reports', 'flavor-starter-flavor'),
-            'free'  => $format_export($free_limits['export_level']),
-            'paid'  => $format_export($paid_limits['export_level']),
-            'fleet' => $format_export($fleet_limits['export_level']),
-        ),
-        array(
-            'name'  => __('Service Templates', 'flavor-starter-flavor'),
-            'free'  => $format_number($free_limits['max_templates']),
-            'paid'  => $format_number($paid_limits['max_templates']),
-            'fleet' => $format_number($fleet_limits['max_templates']),
-        ),
-        array(
-            'name'  => __('Vehicle Photos', 'flavor-starter-flavor'),
-            'free'  => (bool) $free_limits['vehicle_photos'],
-            'paid'  => (bool) $paid_limits['vehicle_photos'],
-            'fleet' => (bool) $fleet_limits['vehicle_photos'],
-        ),
-        array(
-            'name'  => __('API Access', 'flavor-starter-flavor'),
-            'free'  => (bool) $free_limits['api_access'],
-            'paid'  => (bool) $paid_limits['api_access'],
-            'fleet' => (bool) $fleet_limits['api_access'],
-        ),
-        array(
-            'name'  => __('Team Members', 'flavor-starter-flavor'),
-            'free'  => $free_limits['team_members'] > 0 ? $free_limits['team_members'] : __('—', 'flavor-starter-flavor'),
-            'paid'  => $paid_limits['team_members'] > 0 ? $paid_limits['team_members'] : __('—', 'flavor-starter-flavor'),
-            'fleet' => $fleet_limits['team_members'] > 0 ? sprintf(__('Up to %d', 'flavor-starter-flavor'), $fleet_limits['team_members']) . ' <span class="tmw-feature-badge">' . __('Soon', 'flavor-starter-flavor') . '</span>' : __('—', 'flavor-starter-flavor'),
-        ),
-    );
+// =============================================================================
+// SWPM HELPER FUNCTIONS
+// =============================================================================
+
+/**
+ * Get SWPM level name for a user
+ *
+ * @param int $user_id User ID
+ * @return string Level name
+ */
+function tmw_get_swpm_level_name($user_id = 0) {
+    if (!$user_id) {
+        $user_id = get_current_user_id();
+    }
+
+    $adapter = tmw_get_membership_adapter();
+    
+    if ($adapter && method_exists($adapter, 'get_level_name')) {
+        $name = $adapter->get_level_name($user_id);
+        if ($name) {
+            return $name;
+        }
+    }
+
+    // Fallback to tier name
+    return tmw_get_tier_name(tmw_get_user_tier($user_id));
+}
+
+/**
+ * Get SWPM profile page URL
+ *
+ * @return string URL
+ */
+function tmw_get_swpm_profile_url() {
+    $adapter = tmw_get_membership_adapter();
+    
+    if ($adapter && method_exists($adapter, 'get_swpm_page_urls')) {
+        $urls = $adapter->get_swpm_page_urls();
+        if (!empty($urls['profile'])) {
+            return $urls['profile'];
+        }
+    }
+
+    $page = get_page_by_path('membership-profile');
+    return $page ? get_permalink($page) : home_url('/membership-profile/');
+}
+
+/**
+ * Get SWPM join page URL
+ *
+ * @param int|null $level_id Optional level ID
+ * @return string URL
+ */
+function tmw_get_swpm_join_url($level_id = null) {
+    $adapter = tmw_get_membership_adapter();
+    $url = '';
+    
+    if ($adapter && method_exists($adapter, 'get_swpm_page_urls')) {
+        $urls = $adapter->get_swpm_page_urls();
+        $url = $urls['join'] ?? $urls['registration'] ?? '';
+    }
+
+    if (empty($url)) {
+        $page = get_page_by_path('membership-join');
+        $url = $page ? get_permalink($page) : home_url('/membership-join/');
+    }
+
+    if ($level_id) {
+        $url = add_query_arg('level', $level_id, $url);
+    }
+
+    return $url;
+}
+
+// =============================================================================
+// MAP SWPM LEVEL TO TIER
+// =============================================================================
+
+/**
+ * Map a Simple Membership level ID to a tier slug
+ *
+ * @param int $level_id SWPM level ID
+ * @return string Tier slug
+ */
+function tmw_map_level_to_tier($level_id) {
+    $tiers = tmw_get_tiers();
+    
+    foreach ($tiers as $slug => $tier) {
+        if ((int) ($tier['swpm_level_id'] ?? 0) === (int) $level_id) {
+            return $slug;
+        }
+    }
+    
+    // Return first free tier as fallback
+    foreach ($tiers as $slug => $tier) {
+        if (!empty($tier['is_free'])) {
+            return $slug;
+        }
+    }
+    
+    return array_key_first($tiers) ?: 'free';
 }
 
 // =============================================================================
@@ -391,107 +603,6 @@ function tmw_get_feature_comparison() {
 function tmw_subscription_changed($user_id, $old_tier, $new_tier) {
     do_action('tmw_subscription_changed', $user_id, $old_tier, $new_tier);
     
-    // Update user meta with tier
     update_user_meta($user_id, 'tmw_subscription_tier', $new_tier);
     update_user_meta($user_id, 'tmw_tier_changed', current_time('mysql'));
-}
-
-// =============================================================================
-// MEMBERSHIP PLUGIN HELPER FUNCTIONS (Fallbacks)
-// =============================================================================
-
-/**
- * Get membership level name for a user
- * Falls back to tier name if adapter function not available
- *
- * @param int $user_id
- * @return string Level name
- */
-if (!function_exists('tmw_get_swpm_level_name')) {
-    function tmw_get_swpm_level_name($user_id = 0) {
-        if (!$user_id) {
-            $user_id = get_current_user_id();
-        }
-
-        $adapter = tmw_get_membership_adapter();
-        
-        if ($adapter && method_exists($adapter, 'get_level_name')) {
-            $name = $adapter->get_level_name($user_id);
-            if ($name) {
-                return $name;
-            }
-        }
-
-        // Fallback to tier name
-        $tier = tmw_get_user_tier($user_id);
-        return tmw_get_tier_name($tier);
-    }
-}
-
-/**
- * Get membership profile page URL
- *
- * @return string
- */
-if (!function_exists('tmw_get_swpm_profile_url')) {
-    function tmw_get_swpm_profile_url() {
-        $adapter = tmw_get_membership_adapter();
-        
-        if ($adapter && method_exists($adapter, 'get_swpm_page_urls')) {
-            $urls = $adapter->get_swpm_page_urls();
-            if (!empty($urls['profile'])) {
-                return $urls['profile'];
-            }
-        }
-
-        // Fallback - try common page slugs
-        $page = get_page_by_path('membership-profile');
-        if ($page) {
-            return get_permalink($page);
-        }
-
-        return home_url('/membership-profile/');
-    }
-}
-
-/**
- * Get membership join/registration page URL
- *
- * @param int|null $level_id Optional level ID to pre-select
- * @return string
- */
-if (!function_exists('tmw_get_swpm_join_url')) {
-    function tmw_get_swpm_join_url($level_id = null) {
-        $adapter = tmw_get_membership_adapter();
-        $url = '';
-        
-        if ($adapter && method_exists($adapter, 'get_swpm_page_urls')) {
-            $urls = $adapter->get_swpm_page_urls();
-            if (!empty($urls['join'])) {
-                $url = $urls['join'];
-            } elseif (!empty($urls['registration'])) {
-                $url = $urls['registration'];
-            }
-        }
-
-        // Fallback - try common page slugs
-        if (empty($url)) {
-            $page = get_page_by_path('membership-join');
-            if (!$page) {
-                $page = get_page_by_path('join');
-            }
-            if ($page) {
-                $url = get_permalink($page);
-            } else {
-                $url = home_url('/membership-join/');
-            }
-        }
-
-        // Add level parameter if provided
-        if ($level_id) {
-            $url = add_query_arg('level', $level_id, $url);
-        }
-
-        return $url;
-    }
 }
