@@ -1,1 +1,728 @@
+/**
+ * Page Template Styles
+ * Styles for page.php and page-simple-membership.php
+ *
+ * @package tmw-theme
+ */
 
+/* =============================================================================
+   CSS Variables
+   ============================================================================= */
+:root {
+    --tmw-primary: #3b82f6;
+    --tmw-primary-dark: #2563eb;
+    --tmw-secondary: #8b5cf6;
+    --tmw-success: #10b981;
+    --tmw-warning: #f59e0b;
+    --tmw-danger: #ef4444;
+    --tmw-dark: #1f2937;
+    --tmw-light: #f9fafb;
+    --tmw-gray-50: #f9fafb;
+    --tmw-gray-100: #f3f4f6;
+    --tmw-gray-200: #e5e7eb;
+    --tmw-gray-300: #d1d5db;
+    --tmw-gray-400: #9ca3af;
+    --tmw-gray-500: #6b7280;
+    --tmw-gray-600: #4b5563;
+    --tmw-gray-700: #374151;
+    --tmw-gray-800: #1f2937;
+    --tmw-gray-900: #111827;
+    --tmw-border-radius: 8px;
+    --tmw-shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+    --tmw-shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    --tmw-shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    --tmw-transition: all 0.2s ease-in-out;
+}
+
+/* =============================================================================
+   Base Page Layout
+   ============================================================================= */
+.tmw-page {
+    min-height: 100vh;
+    background: var(--tmw-gray-50);
+}
+
+.tmw-page-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+.tmw-page-content.narrow {
+    max-width: 800px;
+}
+
+.tmw-page-content.extra-narrow {
+    max-width: 600px;
+}
+
+/* Page Header */
+.tmw-page-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.tmw-page-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--tmw-gray-900);
+    margin: 0 0 16px 0;
+    line-height: 1.2;
+}
+
+.tmw-page-header .page-description {
+    font-size: 1.125rem;
+    color: var(--tmw-gray-600);
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* Page Body */
+.tmw-page-body {
+    background: #fff;
+    border-radius: var(--tmw-border-radius);
+    box-shadow: var(--tmw-shadow);
+    padding: 32px;
+}
+
+.tmw-page-body.transparent {
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+}
+
+/* =============================================================================
+   Typography
+   ============================================================================= */
+.tmw-page-body h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--tmw-gray-900);
+    margin: 0 0 16px 0;
+}
+
+.tmw-page-body h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--tmw-gray-800);
+    margin: 24px 0 12px 0;
+}
+
+.tmw-page-body p {
+    color: var(--tmw-gray-700);
+    line-height: 1.7;
+    margin: 0 0 16px 0;
+}
+
+.tmw-page-body ul, 
+.tmw-page-body ol {
+    color: var(--tmw-gray-700);
+    margin: 0 0 16px 0;
+    padding-left: 24px;
+}
+
+.tmw-page-body li {
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+.tmw-page-body a {
+    color: var(--tmw-primary);
+    text-decoration: none;
+    transition: var(--tmw-transition);
+}
+
+.tmw-page-body a:hover {
+    color: var(--tmw-primary-dark);
+    text-decoration: underline;
+}
+
+/* =============================================================================
+   Simple Membership Plugin Styles
+   ============================================================================= */
+
+/* SWPM Container */
+.swpm-page-wrapper {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* SWPM Forms General */
+.swpm-login-widget-form,
+.swpm-registration-widget-form,
+.swpm-pw-reset-widget-form,
+.swpm-profile-form,
+.swpm-edit-profile-form {
+    background: #fff;
+    border-radius: var(--tmw-border-radius);
+    box-shadow: var(--tmw-shadow-md);
+    padding: 32px;
+}
+
+/* Form Rows */
+.swpm-form-row,
+.swpm-login-form-row,
+.swpm-registration-form-row {
+    margin-bottom: 20px;
+}
+
+/* Labels */
+.swpm-label,
+.swpm-login-label,
+.swpm-registration-label {
+    display: block;
+    font-weight: 500;
+    color: var(--tmw-gray-700);
+    margin-bottom: 6px;
+    font-size: 0.9375rem;
+}
+
+/* Input Fields */
+.swpm-text-field,
+.swpm-login-text-field,
+.swpm-registration-text-field,
+.swpm-form-field input[type="text"],
+.swpm-form-field input[type="email"],
+.swpm-form-field input[type="password"],
+.swpm-form-field input[type="tel"],
+.swpm-form-field select,
+.swpm-form-field textarea {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 1rem;
+    border: 1px solid var(--tmw-gray-300);
+    border-radius: 6px;
+    background: #fff;
+    color: var(--tmw-gray-900);
+    transition: var(--tmw-transition);
+    box-sizing: border-box;
+}
+
+.swpm-text-field:focus,
+.swpm-login-text-field:focus,
+.swpm-registration-text-field:focus,
+.swpm-form-field input:focus,
+.swpm-form-field select:focus,
+.swpm-form-field textarea:focus {
+    outline: none;
+    border-color: var(--tmw-primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+/* Buttons */
+.swpm-submit,
+.swpm-login-submit,
+.swpm-registration-submit,
+.swpm-pw-reset-submit,
+.swpm-profile-submit,
+.swpm-button,
+input[type="submit"].swpm-submit {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    background: var(--tmw-primary);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--tmw-transition);
+    width: 100%;
+    text-align: center;
+}
+
+.swpm-submit:hover,
+.swpm-login-submit:hover,
+.swpm-registration-submit:hover,
+.swpm-pw-reset-submit:hover,
+.swpm-profile-submit:hover,
+.swpm-button:hover,
+input[type="submit"].swpm-submit:hover {
+    background: var(--tmw-primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--tmw-shadow-md);
+}
+
+/* Secondary Button */
+.swpm-button-secondary {
+    background: var(--tmw-gray-200);
+    color: var(--tmw-gray-700);
+}
+
+.swpm-button-secondary:hover {
+    background: var(--tmw-gray-300);
+}
+
+/* Login Form Specific */
+.swpm-login-form {
+    text-align: left;
+}
+
+.swpm-login-form-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.swpm-remember-me {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9375rem;
+    color: var(--tmw-gray-600);
+}
+
+.swpm-remember-me input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--tmw-primary);
+}
+
+.swpm-forgot-pass,
+.swpm-forgot-password {
+    margin-top: 16px;
+    text-align: center;
+}
+
+.swpm-forgot-pass a,
+.swpm-forgot-password a {
+    color: var(--tmw-primary);
+    font-size: 0.9375rem;
+    text-decoration: none;
+}
+
+.swpm-forgot-pass a:hover,
+.swpm-forgot-password a:hover {
+    text-decoration: underline;
+}
+
+/* Registration Form */
+.swpm-registration-form .swpm-form-row {
+    margin-bottom: 16px;
+}
+
+.swpm-registration-form .swpm-required {
+    color: var(--tmw-danger);
+}
+
+/* Profile Form */
+.swpm-profile-form .swpm-profile-username,
+.swpm-profile-form .swpm-profile-email,
+.swpm-profile-form .swpm-profile-membership-level {
+    background: var(--tmw-gray-50);
+    padding: 16px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+}
+
+.swpm-profile-form .swpm-profile-label {
+    font-size: 0.875rem;
+    color: var(--tmw-gray-500);
+    margin-bottom: 4px;
+}
+
+.swpm-profile-form .swpm-profile-value {
+    font-weight: 600;
+    color: var(--tmw-gray-900);
+}
+
+/* Membership Level Display */
+.swpm-membership-level-name {
+    display: inline-block;
+    padding: 4px 12px;
+    background: var(--tmw-primary);
+    color: #fff;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Error Messages */
+.swpm-login-error,
+.swpm-registration-error,
+.swpm-error-message,
+.swpm-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 0.9375rem;
+}
+
+/* Success Messages */
+.swpm-login-success,
+.swpm-registration-success,
+.swpm-success-message,
+.swpm-success {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    color: #059669;
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 0.9375rem;
+}
+
+/* Info Messages */
+.swpm-info-message,
+.swpm-info {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #2563eb;
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 0.9375rem;
+}
+
+/* =============================================================================
+   Stripe Payment Button Styles
+   ============================================================================= */
+.swpm-payment-button-wrapper,
+.swpm-stripe-payment-wrapper {
+    text-align: center;
+    margin: 24px 0;
+}
+
+.swpm-stripe-buy-now-button,
+.stripe_button_wrapper button,
+.swpm-payment-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 32px;
+    font-size: 1.0625rem;
+    font-weight: 600;
+    color: #fff;
+    background: linear-gradient(135deg, var(--tmw-primary), var(--tmw-secondary));
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--tmw-transition);
+    box-shadow: var(--tmw-shadow);
+}
+
+.swpm-stripe-buy-now-button:hover,
+.stripe_button_wrapper button:hover,
+.swpm-payment-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--tmw-shadow-lg);
+}
+
+/* Payment Amount Display */
+.swpm-payment-amount {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--tmw-gray-900);
+    margin-bottom: 8px;
+}
+
+.swpm-payment-period {
+    font-size: 0.9375rem;
+    color: var(--tmw-gray-500);
+}
+
+/* =============================================================================
+   Membership Level Selection (Join Page)
+   ============================================================================= */
+.swpm-membership-levels-wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin: 32px 0;
+}
+
+.swpm-membership-level-box {
+    background: #fff;
+    border: 2px solid var(--tmw-gray-200);
+    border-radius: var(--tmw-border-radius);
+    padding: 24px;
+    text-align: center;
+    transition: var(--tmw-transition);
+}
+
+.swpm-membership-level-box:hover {
+    border-color: var(--tmw-primary);
+    box-shadow: var(--tmw-shadow-md);
+}
+
+.swpm-membership-level-box.popular,
+.swpm-membership-level-box.recommended {
+    border-color: var(--tmw-primary);
+    position: relative;
+}
+
+.swpm-membership-level-box.popular::before,
+.swpm-membership-level-box.recommended::before {
+    content: "Most Popular";
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--tmw-primary);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 16px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.swpm-level-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--tmw-gray-900);
+    margin-bottom: 8px;
+}
+
+.swpm-level-price {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--tmw-primary);
+    margin-bottom: 16px;
+}
+
+.swpm-level-price .currency {
+    font-size: 1.25rem;
+    vertical-align: super;
+}
+
+.swpm-level-price .period {
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--tmw-gray-500);
+}
+
+.swpm-level-description {
+    color: var(--tmw-gray-600);
+    font-size: 0.9375rem;
+    margin-bottom: 20px;
+    line-height: 1.5;
+}
+
+/* =============================================================================
+   Account Management Section
+   ============================================================================= */
+.swpm-account-info {
+    background: var(--tmw-gray-50);
+    border-radius: var(--tmw-border-radius);
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.swpm-account-info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--tmw-gray-200);
+}
+
+.swpm-account-info-row:last-child {
+    border-bottom: none;
+}
+
+.swpm-account-info-label {
+    font-weight: 500;
+    color: var(--tmw-gray-600);
+}
+
+.swpm-account-info-value {
+    font-weight: 600;
+    color: var(--tmw-gray-900);
+}
+
+/* Status Badges */
+.swpm-status-active {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #d1fae5;
+    color: #065f46;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.swpm-status-inactive,
+.swpm-status-expired {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #fee2e2;
+    color: #991b1b;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.swpm-status-pending {
+    display: inline-block;
+    padding: 4px 12px;
+    background: #fef3c7;
+    color: #92400e;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* =============================================================================
+   Dividers and Separators
+   ============================================================================= */
+.swpm-or-divider {
+    display: flex;
+    align-items: center;
+    margin: 24px 0;
+    color: var(--tmw-gray-400);
+    font-size: 0.875rem;
+}
+
+.swpm-or-divider::before,
+.swpm-or-divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: var(--tmw-gray-200);
+}
+
+.swpm-or-divider span {
+    padding: 0 16px;
+}
+
+/* =============================================================================
+   Links Section
+   ============================================================================= */
+.swpm-login-links,
+.swpm-registration-links {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--tmw-gray-200);
+    text-align: center;
+}
+
+.swpm-login-links a,
+.swpm-registration-links a {
+    color: var(--tmw-primary);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.swpm-login-links a:hover,
+.swpm-registration-links a:hover {
+    text-decoration: underline;
+}
+
+/* =============================================================================
+   Responsive Design
+   ============================================================================= */
+@media (max-width: 768px) {
+    .tmw-page-content {
+        padding: 24px 16px;
+    }
+
+    .tmw-page-header h1 {
+        font-size: 1.875rem;
+    }
+
+    .tmw-page-header .page-description {
+        font-size: 1rem;
+    }
+
+    .tmw-page-body {
+        padding: 20px;
+    }
+
+    .swpm-login-widget-form,
+    .swpm-registration-widget-form,
+    .swpm-pw-reset-widget-form,
+    .swpm-profile-form,
+    .swpm-edit-profile-form {
+        padding: 20px;
+    }
+
+    .swpm-membership-levels-wrapper {
+        grid-template-columns: 1fr;
+    }
+
+    .swpm-account-info-row {
+        flex-direction: column;
+        gap: 4px;
+    }
+}
+
+@media (max-width: 480px) {
+    .tmw-page-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .swpm-text-field,
+    .swpm-login-text-field,
+    .swpm-registration-text-field {
+        padding: 10px 14px;
+    }
+
+    .swpm-submit,
+    .swpm-login-submit,
+    .swpm-registration-submit {
+        padding: 10px 20px;
+    }
+}
+
+/* =============================================================================
+   Dark Mode Support
+   ============================================================================= */
+@media (prefers-color-scheme: dark) {
+    .tmw-page.auto-dark-mode {
+        background: var(--tmw-gray-900);
+    }
+
+    .tmw-page.auto-dark-mode .tmw-page-header h1 {
+        color: var(--tmw-gray-100);
+    }
+
+    .tmw-page.auto-dark-mode .tmw-page-header .page-description {
+        color: var(--tmw-gray-400);
+    }
+
+    .tmw-page.auto-dark-mode .tmw-page-body {
+        background: var(--tmw-gray-800);
+    }
+
+    .tmw-page.auto-dark-mode .swpm-login-widget-form,
+    .tmw-page.auto-dark-mode .swpm-registration-widget-form,
+    .tmw-page.auto-dark-mode .swpm-profile-form {
+        background: var(--tmw-gray-800);
+    }
+
+    .tmw-page.auto-dark-mode .swpm-text-field,
+    .tmw-page.auto-dark-mode .swpm-login-text-field,
+    .tmw-page.auto-dark-mode input[type="text"],
+    .tmw-page.auto-dark-mode input[type="email"],
+    .tmw-page.auto-dark-mode input[type="password"] {
+        background: var(--tmw-gray-700);
+        border-color: var(--tmw-gray-600);
+        color: var(--tmw-gray-100);
+    }
+}
+
+/* =============================================================================
+   Utility Classes
+   ============================================================================= */
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: 8px; }
+.mt-2 { margin-top: 16px; }
+.mt-3 { margin-top: 24px; }
+.mt-4 { margin-top: 32px; }
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: 8px; }
+.mb-2 { margin-bottom: 16px; }
+.mb-3 { margin-bottom: 24px; }
+.mb-4 { margin-bottom: 32px; }
+.hidden { display: none; }
