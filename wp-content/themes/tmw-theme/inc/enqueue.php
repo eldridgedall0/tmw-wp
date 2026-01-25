@@ -128,13 +128,7 @@ function tmw_enqueue_assets() {
         true
     );
 
-    // Page templates CSS
-wp_enqueue_style(
-    'tmw-page-templates',
-    TMW_THEME_URI . '/assets/css/page-templates.css',
-    array(),
-    TMW_THEME_VERSION
-);
+    
 
     // Theme toggle
     wp_enqueue_script(
