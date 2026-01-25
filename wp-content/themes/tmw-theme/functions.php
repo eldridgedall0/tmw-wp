@@ -29,6 +29,7 @@ require_once TMW_THEME_DIR . '/inc/security.php';        // Security & redirects
 require_once TMW_THEME_DIR . '/inc/rest-api.php';        // REST API endpoints
 require_once TMW_THEME_DIR . '/inc/ajax-handlers.php';   // AJAX handlers
 require_once TMW_THEME_DIR . '/inc/template-functions.php'; // Template helpers
+require_once TMW_THEME_DIR . '/inc/enqueue-pages.php';
 
 // =============================================================================
 // THEME SETUP
