@@ -1,0 +1,270 @@
+/**
+ * Page Template Styles
+ * Styling for page.php and Simple Membership pages
+ */
+
+/* ============================================================================
+   Container & Layout
+   ========================================================================= */
+.tmw-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+.tmw-page-content,
+.tmw-membership-page {
+    min-height: 60vh;
+    padding: 2rem 0;
+}
+
+/* ============================================================================
+   Page Header
+   ========================================================================= */
+.entry-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(var(--tmw-border-color, 200, 200, 200), 0.2);
+}
+
+.entry-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin: 0;
+    line-height: 1.2;
+    color: var(--tmw-heading-color, #1a1a1a);
+}
+
+/* ============================================================================
+   Page Content
+   ========================================================================= */
+.entry-content {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--tmw-text-color, #333);
+}
+
+.entry-content h1,
+.entry-content h2,
+.entry-content h3,
+.entry-content h4,
+.entry-content h5,
+.entry-content h6 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    line-height: 1.3;
+}
+
+.entry-content h2 { font-size: 2rem; }
+.entry-content h3 { font-size: 1.75rem; }
+.entry-content h4 { font-size: 1.5rem; }
+
+.entry-content p {
+    margin-bottom: 1.5rem;
+}
+
+.entry-content ul,
+.entry-content ol {
+    margin-bottom: 1.5rem;
+    padding-left: 2rem;
+}
+
+.entry-content li {
+    margin-bottom: 0.5rem;
+}
+
+.entry-content a {
+    color: var(--tmw-link-color, #0066cc);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.entry-content a:hover {
+    color: var(--tmw-link-hover-color, #004499);
+    text-decoration: underline;
+}
+
+/* ============================================================================
+   Simple Membership Forms
+   ========================================================================= */
+.swpm-registration-form,
+.swpm-login-form,
+.swpm-reset-form,
+.swpm-profile-form {
+    max-width: 500px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: var(--tmw-card-bg, #ffffff);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.swpm-registration-form label,
+.swpm-login-form label,
+.swpm-reset-form label,
+.swpm-profile-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--tmw-label-color, #555);
+}
+
+.swpm-registration-form input[type="text"],
+.swpm-registration-form input[type="email"],
+.swpm-registration-form input[type="password"],
+.swpm-login-form input[type="text"],
+.swpm-login-form input[type="password"],
+.swpm-reset-form input[type="email"],
+.swpm-profile-form input[type="text"],
+.swpm-profile-form input[type="email"] {
+    width: 100%;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid var(--tmw-input-border, #ddd);
+    border-radius: 4px;
+    font-size: 1rem;
+    background: var(--tmw-input-bg, #fff);
+    color: var(--tmw-input-text, #333);
+    transition: border-color 0.2s ease;
+}
+
+.swpm-registration-form input:focus,
+.swpm-login-form input:focus,
+.swpm-reset-form input:focus,
+.swpm-profile-form input:focus {
+    outline: none;
+    border-color: var(--tmw-primary-color, #0066cc);
+}
+
+.swpm-registration-form input[type="submit"],
+.swpm-login-form input[type="submit"],
+.swpm-reset-form input[type="submit"],
+.swpm-profile-form input[type="submit"] {
+    width: 100%;
+    padding: 0.875rem;
+    background: var(--tmw-button-bg, #0066cc);
+    color: var(--tmw-button-text, #ffffff);
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.swpm-registration-form input[type="submit"]:hover,
+.swpm-login-form input[type="submit"]:hover,
+.swpm-reset-form input[type="submit"]:hover,
+.swpm-profile-form input[type="submit"]:hover {
+    background: var(--tmw-button-hover-bg, #004499);
+}
+
+/* ============================================================================
+   Error & Success Messages
+   ========================================================================= */
+.swpm-registration-widget-error,
+.swpm-login-widget-error {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    background: #fee;
+    border: 1px solid #fcc;
+    border-radius: 4px;
+    color: #c00;
+}
+
+.swpm-registration-widget-success,
+.swpm-login-widget-success {
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    background: #efe;
+    border: 1px solid #cfc;
+    border-radius: 4px;
+    color: #060;
+}
+
+/* ============================================================================
+   Page Links (pagination)
+   ========================================================================= */
+.page-links {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(var(--tmw-border-color, 200, 200, 200), 0.2);
+}
+
+.page-links a {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    margin: 0 0.25rem;
+    background: var(--tmw-button-bg, #0066cc);
+    color: var(--tmw-button-text, #ffffff);
+    border-radius: 4px;
+    text-decoration: none;
+}
+
+.page-links a:hover {
+    background: var(--tmw-button-hover-bg, #004499);
+}
+
+/* ============================================================================
+   Dark Mode Support
+   ========================================================================= */
+.tmw-theme-dark .entry-title {
+    color: var(--tmw-dark-heading-color, #f5f5f5);
+}
+
+.tmw-theme-dark .entry-content {
+    color: var(--tmw-dark-text-color, #ddd);
+}
+
+.tmw-theme-dark .swpm-registration-form,
+.tmw-theme-dark .swpm-login-form,
+.tmw-theme-dark .swpm-reset-form,
+.tmw-theme-dark .swpm-profile-form {
+    background: var(--tmw-dark-card-bg, #2a2a2a);
+}
+
+.tmw-theme-dark .entry-content a {
+    color: var(--tmw-dark-link-color, #66b3ff);
+}
+
+.tmw-theme-dark .entry-content a:hover {
+    color: var(--tmw-dark-link-hover-color, #99ccff);
+}
+
+/* ============================================================================
+   Responsive Design
+   ========================================================================= */
+@media (max-width: 768px) {
+    .tmw-container {
+        padding: 1rem;
+    }
+    
+    .entry-title {
+        font-size: 2rem;
+    }
+    
+    .entry-content h2 { font-size: 1.75rem; }
+    .entry-content h3 { font-size: 1.5rem; }
+    .entry-content h4 { font-size: 1.25rem; }
+    
+    .swpm-registration-form,
+    .swpm-login-form,
+    .swpm-reset-form,
+    .swpm-profile-form {
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .entry-title {
+        font-size: 1.75rem;
+    }
+    
+    .swpm-registration-form,
+    .swpm-login-form,
+    .swpm-reset-form,
+    .swpm-profile-form {
+        padding: 1rem;
+    }
+}
