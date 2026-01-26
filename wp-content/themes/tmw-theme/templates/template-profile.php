@@ -75,7 +75,7 @@ get_header();
 
                 <div class="tmw-subscription-actions">
                     <?php if ($is_free) : ?>
-                        <a href="<?php echo esc_url(tmw_get_page_url('pricing')); ?>" class="tmw-btn tmw-btn-primary">
+                        <a href="<?php echo esc_url(tmw_get_page_url('subscription')); ?>" class="tmw-btn tmw-btn-primary">
                             <i class="fas fa-arrow-up"></i>
                             <?php _e('Upgrade Plan', 'flavor-starter-flavor'); ?>
                         </a>
