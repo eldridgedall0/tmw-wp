@@ -1,6 +1,6 @@
 <?php
 /**
- * Stripe Settings Tab
+ * Stripe Settings Page
  *
  * @package TMW_Stripe_Subscriptions
  */
@@ -12,8 +12,11 @@ if (!defined('ABSPATH')) {
 $webhook_url = rest_url('tmw-stripe/v1/webhook');
 ?>
 
-<div class="tmw-stripe-settings">
-    <form id="tmw-stripe-settings-form">
+<div class="wrap">
+    <h1><?php _e('Stripe Subscriptions Settings', 'tmw-stripe-subscriptions'); ?></h1>
+
+    <div class="tmw-stripe-settings">
+        <form id="tmw-stripe-settings-form">
         
         <!-- Connection Status -->
         <div class="tmw-stripe-status-card" style="background:#f9fafb;border:1px solid #e5e7eb;padding:16px;border-radius:6px;margin-bottom:24px;">
@@ -255,10 +258,11 @@ $webhook_url = rest_url('tmw-stripe/v1/webhook');
             <button type="submit" class="button button-primary" id="tmw-save-stripe-settings">
                 <?php _e('Save Settings', 'tmw-stripe-subscriptions'); ?>
             </button>
-            <span id="tmw-stripe-save-status" style="margin-left:10px;"></span>
+            <span id="tmw-stripe-save-status" class="tmw-save-status" style="margin-left:10px;"></span>
         </p>
     </form>
 </div>
+</div><!-- .wrap -->
 
 <script>
 jQuery(document).ready(function($) {

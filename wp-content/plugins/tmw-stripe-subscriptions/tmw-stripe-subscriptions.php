@@ -142,24 +142,21 @@ final class TMW_Stripe_Subscriptions {
     private function define_admin_hooks() {
         $admin = new TMW_Stripe_Admin();
         $settings = new TMW_Stripe_Settings();
-        $subscribers = new TMW_Stripe_Subscribers();
 
-        // Admin menu and scripts
-        $this->loader->add_action('admin_menu', $admin, 'add_subscribers_menu');
+        // Admin menu (top-level Stripe Subscriptions menu)
+        $this->loader->add_action('admin_menu', $admin, 'add_admin_menu');
         $this->loader->add_action('admin_enqueue_scripts', $admin, 'enqueue_scripts');
 
-        // Settings tab hooks
-        $this->loader->add_filter('tmw_admin_tabs', $settings, 'add_stripe_tab');
-        $this->loader->add_action('tmw_render_stripe_tab', $settings, 'render_tab');
+        // Plugin action links
+        $this->loader->add_filter('plugin_action_links_' . TMW_STRIPE_PLUGIN_BASENAME, $admin, 'add_plugin_action_links');
+
+        // AJAX handlers for settings
         $this->loader->add_action('wp_ajax_tmw_save_stripe_settings', $settings, 'ajax_save_settings');
         $this->loader->add_action('wp_ajax_tmw_test_stripe_connection', $settings, 'ajax_test_connection');
 
-        // Tier modal Stripe fields
+        // Tier modal Stripe fields (integrates with TMW Settings)
         $this->loader->add_action('tmw_tier_modal_fields', $settings, 'render_tier_stripe_fields');
         $this->loader->add_action('admin_footer', $settings, 'render_tier_fields_script');
-
-        // Subscribers page
-        $this->loader->add_action('admin_init', $subscribers, 'process_actions');
     }
 
     /**

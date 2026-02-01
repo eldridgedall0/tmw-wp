@@ -14,28 +14,77 @@ if (!defined('ABSPATH')) {
 class TMW_Stripe_Admin {
 
     /**
-     * Add subscribers submenu under TrackMyWrench
+     * Menu slug
      */
-    public function add_subscribers_menu() {
+    const MENU_SLUG = 'tmw-stripe';
+
+    /**
+     * Add Stripe menu and submenus
+     */
+    public function add_admin_menu() {
+        // Main menu - Stripe Subscriptions
+        add_menu_page(
+            __('Stripe Subscriptions', 'tmw-stripe-subscriptions'),
+            __('Stripe Subs', 'tmw-stripe-subscriptions'),
+            'manage_options',
+            self::MENU_SLUG,
+            array($this, 'render_settings_page'),
+            'dashicons-money-alt',
+            30 // Position after Comments
+        );
+
+        // Submenu - Settings (same as parent)
         add_submenu_page(
-            'tmw-settings', // Parent slug (TMW Settings page)
+            self::MENU_SLUG,
+            __('Stripe Settings', 'tmw-stripe-subscriptions'),
+            __('Settings', 'tmw-stripe-subscriptions'),
+            'manage_options',
+            self::MENU_SLUG, // Same slug as parent to replace default
+            array($this, 'render_settings_page')
+        );
+
+        // Submenu - Subscribers
+        add_submenu_page(
+            self::MENU_SLUG,
             __('Subscribers', 'tmw-stripe-subscriptions'),
             __('Subscribers', 'tmw-stripe-subscriptions'),
             'manage_options',
-            'tmw-subscribers',
+            'tmw-stripe-subscribers',
             array($this, 'render_subscribers_page')
         );
+    }
+
+    /**
+     * Render settings page
+     */
+    public function render_settings_page() {
+        $settings = TMW_Stripe_API::get_settings();
+        $mode = $settings['mode'] ?? 'test';
+        $is_configured = TMW_Stripe_API::is_configured();
+
+        include TMW_STRIPE_PLUGIN_DIR . 'admin/partials/settings-page.php';
     }
 
     /**
      * Render subscribers page
      */
     public function render_subscribers_page() {
-        // Include the subscribers list table class
         $subscribers = new TMW_Stripe_Subscribers();
         $subscribers->prepare_items();
 
         include TMW_STRIPE_PLUGIN_DIR . 'admin/partials/subscribers-page.php';
+    }
+
+    /**
+     * Get Stripe dashboard URL
+     *
+     * @return string
+     */
+    public function get_stripe_dashboard_url() {
+        $mode = TMW_Stripe_API::get_mode();
+        return $mode === 'live' 
+            ? 'https://dashboard.stripe.com/subscriptions' 
+            : 'https://dashboard.stripe.com/test/subscriptions';
     }
 
     /**
@@ -44,9 +93,11 @@ class TMW_Stripe_Admin {
      * @param string $hook
      */
     public function enqueue_scripts($hook) {
-        // Only load on our pages or TMW settings
+        // Only load on our pages
         $allowed_pages = array(
-            'trackmywrench_page_tmw-subscribers',
+            'toplevel_page_tmw-stripe',
+            'stripe-subs_page_tmw-stripe-subscribers',
+            // Also load on TMW settings for tier field integration
             'toplevel_page_tmw-settings',
         );
 
@@ -82,5 +133,23 @@ class TMW_Stripe_Admin {
                 'confirmDelete'  => __('Are you sure?', 'tmw-stripe-subscriptions'),
             ),
         ));
+    }
+
+    /**
+     * Add settings link on plugins page
+     *
+     * @param array $links
+     * @return array
+     */
+    public function add_plugin_action_links($links) {
+        $settings_link = sprintf(
+            '<a href="%s">%s</a>',
+            admin_url('admin.php?page=' . self::MENU_SLUG),
+            __('Settings', 'tmw-stripe-subscriptions')
+        );
+
+        array_unshift($links, $settings_link);
+
+        return $links;
     }
 }

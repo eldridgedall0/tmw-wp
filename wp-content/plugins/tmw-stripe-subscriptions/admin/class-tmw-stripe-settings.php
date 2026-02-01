@@ -2,7 +2,7 @@
 /**
  * Stripe Settings
  *
- * Handles Stripe settings tab and tier Stripe fields.
+ * Handles Stripe settings page and tier Stripe fields.
  *
  * @package TMW_Stripe_Subscriptions
  */
@@ -12,28 +12,6 @@ if (!defined('ABSPATH')) {
 }
 
 class TMW_Stripe_Settings {
-
-    /**
-     * Add Stripe tab to TMW settings
-     *
-     * @param array $tabs
-     * @return array
-     */
-    public function add_stripe_tab($tabs) {
-        $tabs['stripe'] = __('Stripe', 'tmw-stripe-subscriptions');
-        return $tabs;
-    }
-
-    /**
-     * Render Stripe settings tab
-     */
-    public function render_tab() {
-        $settings = TMW_Stripe_API::get_settings();
-        $mode = $settings['mode'] ?? 'test';
-        $is_configured = TMW_Stripe_API::is_configured();
-
-        include TMW_STRIPE_PLUGIN_DIR . 'admin/partials/settings-page.php';
-    }
 
     /**
      * AJAX: Save Stripe settings
@@ -91,7 +69,7 @@ class TMW_Stripe_Settings {
     }
 
     /**
-     * Render Stripe fields in tier modal
+     * Render Stripe fields in tier modal (for TMW Settings integration)
      */
     public function render_tier_stripe_fields() {
         include TMW_STRIPE_PLUGIN_DIR . 'admin/partials/tier-fields.php';
@@ -130,47 +108,6 @@ class TMW_Stripe_Settings {
             // When tier modal opens, apply current plugin setting
             $(document).on('click', '.tmw-edit-tier, #tmw-add-tier', function() {
                 setTimeout(toggleStripeFields, 100);
-            });
-
-            // Extend tier save to include Stripe fields
-            var originalSaveTier = window.tmwSaveTier;
-            if (typeof originalSaveTier === 'function') {
-                window.tmwSaveTier = function() {
-                    // Add Stripe fields to data
-                    var data = originalSaveTier.call(this);
-                    if (data && data.data) {
-                        data.data.stripe_price_id_monthly = $('#tier-stripe-price-monthly').val();
-                        data.data.stripe_price_id_yearly = $('#tier-stripe-price-yearly').val();
-                        data.data.stripe_product_id = $('#tier-stripe-product-id').val();
-                    }
-                    return data;
-                };
-            }
-
-            // Populate Stripe fields when editing tier
-            $(document).on('click', '.tmw-edit-tier', function() {
-                var $row = $(this).closest('tr');
-                var slug = $row.data('slug');
-                
-                // Fetch tier data via AJAX to get Stripe fields
-                $.post(ajaxurl, {
-                    action: 'tmw_get_tier_stripe_data',
-                    nonce: '<?php echo wp_create_nonce('tmw_admin_nonce'); ?>',
-                    slug: slug
-                }, function(response) {
-                    if (response.success) {
-                        $('#tier-stripe-price-monthly').val(response.data.stripe_price_id_monthly || '');
-                        $('#tier-stripe-price-yearly').val(response.data.stripe_price_id_yearly || '');
-                        $('#tier-stripe-product-id').val(response.data.stripe_product_id || '');
-                    }
-                });
-            });
-
-            // Clear Stripe fields when adding new tier
-            $(document).on('click', '#tmw-add-tier', function() {
-                $('#tier-stripe-price-monthly').val('');
-                $('#tier-stripe-price-yearly').val('');
-                $('#tier-stripe-product-id').val('');
             });
         });
         </script>

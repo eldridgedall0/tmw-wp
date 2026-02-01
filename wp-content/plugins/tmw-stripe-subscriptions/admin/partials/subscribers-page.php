@@ -8,13 +8,15 @@
 if (!defined('ABSPATH')) {
     exit;
 }
+
+$admin = new TMW_Stripe_Admin();
 ?>
 
 <div class="wrap">
     <h1 class="wp-heading-inline"><?php _e('Subscribers', 'tmw-stripe-subscriptions'); ?></h1>
     
     <?php if (TMW_Stripe_API::is_configured()) : ?>
-        <a href="<?php echo esc_url($this->get_stripe_dashboard_url()); ?>" target="_blank" class="page-title-action">
+        <a href="<?php echo esc_url($admin->get_stripe_dashboard_url()); ?>" target="_blank" class="page-title-action">
             <?php _e('View in Stripe', 'tmw-stripe-subscriptions'); ?>
         </a>
     <?php endif; ?>
@@ -30,7 +32,7 @@ if (!defined('ABSPATH')) {
         <?php $subscribers->views(); ?>
 
         <form method="get">
-            <input type="hidden" name="page" value="tmw-subscribers">
+            <input type="hidden" name="page" value="tmw-stripe-subscribers">
             <?php
             $subscribers->search_box(__('Search', 'tmw-stripe-subscriptions'), 'subscriber');
             $subscribers->display();
@@ -49,16 +51,3 @@ if (!defined('ABSPATH')) {
         </ul>
     </div>
 </div>
-
-<?php
-/**
- * Helper method for Stripe dashboard URL
- */
-if (!method_exists($this, 'get_stripe_dashboard_url')) {
-    function get_stripe_dashboard_url() {
-        $mode = TMW_Stripe_API::get_mode();
-        return $mode === 'live' 
-            ? 'https://dashboard.stripe.com/subscriptions' 
-            : 'https://dashboard.stripe.com/test/subscriptions';
-    }
-}
