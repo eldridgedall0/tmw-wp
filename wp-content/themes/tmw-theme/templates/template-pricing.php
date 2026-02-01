@@ -103,6 +103,7 @@ get_header();
                         <a href="<?php echo esc_url(tmw_get_swpm_join_url($paid_level_id)); ?>" class="tmw-btn tmw-btn-primary tmw-btn-full">
                             <?php _e('Subscribe Now', 'flavor-starter-flavor'); ?>
                         </a>
+						<?php echo do_shortcode('[swpm_payment_button id="88"]'); ?>
                     <?php endif; ?>
                 </div>
             </div>
