@@ -80,7 +80,7 @@ get_header();
                             <?php _e('Upgrade Plan', 'flavor-starter-flavor'); ?>
                         </a>
                     <?php else : ?>
-                        <a href="<?php echo esc_url(tmw_get_swpm_profile_url()); ?>" class="tmw-btn tmw-btn-secondary">
+                        <a href="<?php echo esc_url(tmw_get_swpm_profile_url()); ?>" class="tmw-btn tmw-btn-secondary" style="display:none">
                             <?php _e('Manage Subscription', 'flavor-starter-flavor'); ?>
                         </a>
 						<?php echo do_shortcode('[swpm_stripe_subscription_cancel_link]'); ?>
