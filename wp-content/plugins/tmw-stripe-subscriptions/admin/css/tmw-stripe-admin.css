@@ -1,0 +1,181 @@
+/**
+ * TMW Stripe Admin Styles
+ *
+ * @package TMW_Stripe_Subscriptions
+ */
+
+/* Settings Page */
+.tmw-stripe-settings {
+    max-width: 800px;
+}
+
+.tmw-stripe-settings h3 {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.tmw-stripe-settings h3:first-of-type {
+    margin-top: 20px;
+    padding-top: 0;
+    border-top: none;
+}
+
+/* Status Card */
+.tmw-stripe-status-card {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    padding: 16px;
+    border-radius: 6px;
+    margin-bottom: 24px;
+}
+
+.tmw-stripe-status-card .status-connected {
+    color: #22c55e;
+}
+
+.tmw-stripe-status-card .status-error {
+    color: #ef4444;
+}
+
+/* Form Tables */
+.tmw-stripe-settings .form-table th {
+    width: 180px;
+    padding: 15px 10px 15px 0;
+}
+
+.tmw-stripe-settings .form-table td {
+    padding: 10px;
+}
+
+.tmw-stripe-settings .form-table input[type="text"],
+.tmw-stripe-settings .form-table input[type="password"],
+.tmw-stripe-settings .form-table input[type="number"] {
+    width: 100%;
+    max-width: 400px;
+}
+
+.tmw-stripe-settings .form-table select {
+    min-width: 200px;
+}
+
+/* Password Toggle */
+.tmw-toggle-password {
+    margin-left: 5px;
+    cursor: pointer;
+    padding: 4px 8px !important;
+}
+
+/* Webhook URL */
+#webhook-url {
+    display: block;
+    padding: 10px;
+    background: #f3f4f6;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    word-break: break-all;
+    font-size: 12px;
+}
+
+/* Save Status */
+.tmw-save-status {
+    font-weight: 500;
+}
+
+.tmw-save-status.success {
+    color: #22c55e;
+}
+
+.tmw-save-status.error {
+    color: #ef4444;
+}
+
+/* Subscribers Page */
+.tmw-subscribers-wrap {
+    margin-top: 15px;
+}
+
+.tmw-subscribers-wrap .tablenav {
+    margin: 6px 0;
+}
+
+/* Tier Stripe Fields */
+.tmw-stripe-tier-fields {
+    background: #f9fafb;
+    padding: 15px;
+    margin: 15px -15px -15px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.tmw-stripe-tier-fields h4 {
+    margin: 0 0 10px;
+    color: #6b7280;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tmw-stripe-tier-fields .tmw-field-row {
+    margin-bottom: 12px;
+}
+
+.tmw-stripe-tier-fields .tmw-field-row:last-child {
+    margin-bottom: 0;
+}
+
+.tmw-stripe-tier-fields label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.tmw-stripe-tier-fields .description {
+    font-size: 11px;
+    color: #6b7280;
+    margin-top: 4px;
+}
+
+/* Badges */
+.tmw-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 500;
+}
+
+/* Help Box */
+.tmw-subscribers-help {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    padding: 15px;
+    border-radius: 6px;
+    margin-top: 20px;
+}
+
+.tmw-subscribers-help h3 {
+    margin-top: 0;
+    font-size: 14px;
+}
+
+.tmw-subscribers-help ul {
+    margin-bottom: 0;
+}
+
+.tmw-subscribers-help li {
+    margin-bottom: 5px;
+}
+
+/* Responsive */
+@media screen and (max-width: 782px) {
+    .tmw-stripe-settings .form-table th {
+        width: auto;
+        display: block;
+        padding-bottom: 5px;
+    }
+    
+    .tmw-stripe-settings .form-table td {
+        display: block;
+        padding-left: 0;
+    }
+}
