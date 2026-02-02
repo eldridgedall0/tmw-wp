@@ -12,6 +12,17 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+// Define the interface if it doesn't exist (theme may not be loaded)
+if (!interface_exists('TMW_Membership_Adapter_Interface')) {
+    interface TMW_Membership_Adapter_Interface {
+        public function get_user_tier($user_id);
+        public function is_active($user_id);
+        public function get_expiry_date($user_id);
+        public function get_level_id($user_id);
+        public function is_plugin_active();
+    }
+}
+
 class TMW_Stripe_Adapter implements TMW_Membership_Adapter_Interface {
 
     /**
