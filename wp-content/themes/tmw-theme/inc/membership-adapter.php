@@ -97,6 +97,17 @@ function tmw_get_membership_adapter() {
             require_once TMW_THEME_DIR . '/inc/adapters/user-meta.php';
             $adapter = new TMW_User_Meta_Adapter();
             break;
+			
+		case 'stripe':
+    	// Load Stripe adapter from plugin if active
+    		if (class_exists('TMW_Stripe_Adapter')) {
+        		$adapter = new TMW_Stripe_Adapter();
+    		} else {
+        		// Fallback to user-meta if plugin not active
+        		require_once TMW_THEME_DIR . '/inc/adapters/user-meta.php';
+        		$adapter = new TMW_User_Meta_Adapter();
+    		}
+    		break;
     }
 
     // Verify plugin is active
@@ -165,6 +176,11 @@ function tmw_detect_membership_plugins() {
     if (defined('MEPR_VERSION') || class_exists('MeprUser')) {
         $active[] = 'memberpress';
     }
+	
+	// Stripe (TMW Stripe Subscriptions plugin)
+	if (class_exists('TMW_Stripe_Subscriptions') || defined('TMW_STRIPE_VERSION')) {
+    	$active[] = 'stripe';
+	}
 
     // Always available
     $active[] = 'user-meta';
