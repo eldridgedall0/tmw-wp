@@ -2,8 +2,9 @@
 /**
  * Stripe Membership Adapter
  *
- * Implements TMW_Membership_Adapter_Interface for Stripe subscriptions.
- * This class integrates with the theme's adapter pattern.
+ * Provides the same methods as TMW_Membership_Adapter_Interface
+ * but does NOT formally implement it to avoid declaration conflicts.
+ * PHP duck typing allows this to work with the theme's adapter pattern.
  *
  * @package TMW_Stripe_Subscriptions
  */
@@ -12,18 +13,14 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-// Define the interface if it doesn't exist (theme may not be loaded)
-if (!interface_exists('TMW_Membership_Adapter_Interface')) {
-    interface TMW_Membership_Adapter_Interface {
-        public function get_user_tier($user_id);
-        public function is_active($user_id);
-        public function get_expiry_date($user_id);
-        public function get_level_id($user_id);
-        public function is_plugin_active();
-    }
-}
-
-class TMW_Stripe_Adapter implements TMW_Membership_Adapter_Interface {
+/**
+ * Stripe Adapter Class
+ * 
+ * Note: This class intentionally does NOT implement TMW_Membership_Adapter_Interface
+ * to avoid "interface already declared" errors when the theme also declares it.
+ * It provides all the same methods so it works with the theme's adapter pattern.
+ */
+class TMW_Stripe_Adapter {
 
     /**
      * Check if the Stripe plugin is active and configured
