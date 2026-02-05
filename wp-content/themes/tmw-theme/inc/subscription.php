@@ -610,6 +610,7 @@ function tmw_subscription_changed($user_id, $old_tier, $new_tier) {
 // =============================================================================
 // GENERIC SUBSCRIPTION URL HELPERS
 // These functions work with any membership plugin based on settings
+// Note: Some of these may also be defined by the Stripe plugin - use function_exists()
 // =============================================================================
 
 /**
@@ -617,61 +618,75 @@ function tmw_subscription_changed($user_id, $old_tier, $new_tier) {
  *
  * @return bool
  */
-function tmw_is_stripe_active() {
-    $plugin = tmw_get_setting('membership_plugin', 'simple-membership');
-    return $plugin === 'stripe' && defined('TMW_STRIPE_VERSION');
+if (!function_exists('tmw_is_stripe_active')) {
+    function tmw_is_stripe_active() {
+        $plugin = tmw_get_setting('membership_plugin', 'simple-membership');
+        return $plugin === 'stripe' && defined('TMW_STRIPE_VERSION');
+    }
 }
 
 /**
  * Get subscribe/checkout URL for a tier
  * Works with any membership plugin based on settings
+ * 
+ * Note: This function may be overridden by the TMW Stripe Subscriptions plugin
  *
  * @param string $tier_slug Tier slug
  * @param string $period 'monthly' or 'yearly'
  * @return string URL
  */
-function tmw_get_subscribe_url($tier_slug, $period = 'monthly') {
-    $plugin = tmw_get_setting('membership_plugin', 'simple-membership');
+if (!function_exists('tmw_get_subscribe_url')) {
+    function tmw_get_subscribe_url($tier_slug, $period = 'monthly') {
+        $plugin = tmw_get_setting('membership_plugin', 'simple-membership');
 
-    switch ($plugin) {
-        case 'stripe':
-            // For Stripe, return # - JavaScript handles checkout via AJAX
-            return '#';
+        switch ($plugin) {
+            case 'stripe':
+                // For Stripe, return # - JavaScript handles checkout via AJAX
+                return '#';
 
-        case 'simple-membership':
-        default:
-            $tier = tmw_get_tier($tier_slug);
-            $level_id = $tier['swpm_level_id'] ?? 0;
-            return tmw_get_swpm_join_url($level_id);
+            case 'simple-membership':
+            default:
+                $tier = tmw_get_tier($tier_slug);
+                $level_id = $tier['swpm_level_id'] ?? 0;
+                return tmw_get_swpm_join_url($level_id);
+        }
     }
 }
 
 /**
  * Get subscription management URL
  * Works with any membership plugin based on settings
+ * 
+ * Note: This function may be overridden by the TMW Stripe Subscriptions plugin
  *
  * @return string URL
  */
-function tmw_get_manage_subscription_url() {
-    $plugin = tmw_get_setting('membership_plugin', 'simple-membership');
+if (!function_exists('tmw_get_manage_subscription_url')) {
+    function tmw_get_manage_subscription_url() {
+        $plugin = tmw_get_setting('membership_plugin', 'simple-membership');
 
-    switch ($plugin) {
-        case 'stripe':
-            // For Stripe, return # - JavaScript handles portal redirect via AJAX
-            return '#';
+        switch ($plugin) {
+            case 'stripe':
+                // For Stripe, return # - JavaScript handles portal redirect via AJAX
+                return '#';
 
-        case 'simple-membership':
-        default:
-            return tmw_get_swpm_profile_url();
+            case 'simple-membership':
+            default:
+                return tmw_get_swpm_profile_url();
+        }
     }
 }
 
 /**
  * Get cancel subscription URL
  * For Stripe, this redirects to portal where cancel is handled
+ * 
+ * Note: This function may be overridden by the TMW Stripe Subscriptions plugin
  *
  * @return string URL
  */
-function tmw_get_cancel_subscription_url() {
-    return tmw_get_manage_subscription_url();
+if (!function_exists('tmw_get_cancel_subscription_url')) {
+    function tmw_get_cancel_subscription_url() {
+        return tmw_get_manage_subscription_url();
+    }
 }
