@@ -72,7 +72,7 @@ class TMW_Stripe_Settings {
      * Render Stripe fields in tier modal (for TMW Settings integration)
      */
     public function render_tier_stripe_fields() {
-        include TMW_STRIPE_PLUGIN_DIR . 'admin/partials/tier-fields.php';
+        include TMW_STRIPE_PLUGIN_DIR . 'admin/partials/tier-stripe-fields.php';
     }
 
     /**
