@@ -83,9 +83,18 @@ get_header();
                         <span class="tmw-renewal-option-period"><?php _e('/month', 'flavor-starter-flavor'); ?></span>
                     </div>
                     <p class="text-muted text-sm mb-4"><?php _e('10 vehicles, unlimited entries, recalls, exports', 'flavor-starter-flavor'); ?></p>
-                    <a href="<?php echo esc_url(tmw_get_swpm_join_url($paid_level_id)); ?>" class="tmw-btn tmw-btn-primary tmw-btn-full">
-                        <?php _e('Subscribe Now', 'flavor-starter-flavor'); ?>
-                    </a>
+                    <?php if (tmw_is_stripe_active()) : ?>
+                        <button type="button" 
+                                class="tmw-btn tmw-btn-primary tmw-btn-full tmw-subscribe-btn" 
+                                data-tier="paid"
+                                data-period="monthly">
+                            <?php _e('Subscribe Now', 'flavor-starter-flavor'); ?>
+                        </button>
+                    <?php else : ?>
+                        <a href="<?php echo esc_url(tmw_get_swpm_join_url($paid_level_id)); ?>" class="tmw-btn tmw-btn-primary tmw-btn-full">
+                            <?php _e('Subscribe Now', 'flavor-starter-flavor'); ?>
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -97,9 +106,18 @@ get_header();
                         <span class="tmw-renewal-option-period"><?php _e('/month', 'flavor-starter-flavor'); ?></span>
                     </div>
                     <p class="text-muted text-sm mb-4"><?php _e('Unlimited everything, API access, team members', 'flavor-starter-flavor'); ?></p>
-                    <a href="<?php echo esc_url(tmw_get_swpm_join_url($fleet_level_id)); ?>" class="tmw-btn tmw-btn-secondary tmw-btn-full">
-                        <?php _e('Go Fleet', 'flavor-starter-flavor'); ?>
-                    </a>
+                    <?php if (tmw_is_stripe_active()) : ?>
+                        <button type="button" 
+                                class="tmw-btn tmw-btn-secondary tmw-btn-full tmw-subscribe-btn" 
+                                data-tier="fleet"
+                                data-period="monthly">
+                            <?php _e('Go Fleet', 'flavor-starter-flavor'); ?>
+                        </button>
+                    <?php else : ?>
+                        <a href="<?php echo esc_url(tmw_get_swpm_join_url($fleet_level_id)); ?>" class="tmw-btn tmw-btn-secondary tmw-btn-full">
+                            <?php _e('Go Fleet', 'flavor-starter-flavor'); ?>
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -116,9 +134,15 @@ get_header();
                 <div class="tmw-card-body">
                     <h3 class="h5 mb-2"><i class="fas fa-user-cog text-accent"></i> <?php _e('Account Settings', 'flavor-starter-flavor'); ?></h3>
                     <p class="text-muted text-sm mb-4"><?php _e('Update your profile and membership details', 'flavor-starter-flavor'); ?></p>
-                    <a href="<?php echo esc_url($swpm_profile_url); ?>" class="tmw-btn tmw-btn-secondary tmw-btn-small">
-                        <?php _e('Manage Account', 'flavor-starter-flavor'); ?>
-                    </a>
+                    <?php if (tmw_is_stripe_active()) : ?>
+                        <button type="button" class="tmw-btn tmw-btn-secondary tmw-btn-small tmw-stripe-portal-btn">
+                            <?php _e('Manage Account', 'flavor-starter-flavor'); ?>
+                        </button>
+                    <?php else : ?>
+                        <a href="<?php echo esc_url($swpm_profile_url); ?>" class="tmw-btn tmw-btn-secondary tmw-btn-small">
+                            <?php _e('Manage Account', 'flavor-starter-flavor'); ?>
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -127,9 +151,15 @@ get_header();
                 <div class="tmw-card-body">
                     <h3 class="h5 mb-2"><i class="fas fa-arrow-up text-success"></i> <?php _e('Upgrade to Fleet', 'flavor-starter-flavor'); ?></h3>
                     <p class="text-muted text-sm mb-4"><?php _e('Get unlimited vehicles and API access', 'flavor-starter-flavor'); ?></p>
-                    <a href="<?php echo esc_url(tmw_get_swpm_join_url($fleet_level_id)); ?>" class="tmw-btn tmw-btn-primary tmw-btn-small">
-                        <?php _e('Upgrade', 'flavor-starter-flavor'); ?>
-                    </a>
+                    <?php if (tmw_is_stripe_active()) : ?>
+                        <button type="button" class="tmw-btn tmw-btn-primary tmw-btn-small tmw-stripe-portal-btn">
+                            <?php _e('Upgrade', 'flavor-starter-flavor'); ?>
+                        </button>
+                    <?php else : ?>
+                        <a href="<?php echo esc_url(tmw_get_swpm_join_url($fleet_level_id)); ?>" class="tmw-btn tmw-btn-primary tmw-btn-small">
+                            <?php _e('Upgrade', 'flavor-starter-flavor'); ?>
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
             <?php endif; ?>
@@ -138,9 +168,15 @@ get_header();
                 <div class="tmw-card-body">
                     <h3 class="h5 mb-2"><i class="fas fa-credit-card text-accent"></i> <?php _e('Billing & Payments', 'flavor-starter-flavor'); ?></h3>
                     <p class="text-muted text-sm mb-4"><?php _e('View invoices and update payment method', 'flavor-starter-flavor'); ?></p>
-                    <a href="<?php echo esc_url($swpm_profile_url); ?>" class="tmw-btn tmw-btn-secondary tmw-btn-small">
-                        <?php _e('View Billing', 'flavor-starter-flavor'); ?>
-                    </a>
+                    <?php if (tmw_is_stripe_active()) : ?>
+                        <button type="button" class="tmw-btn tmw-btn-secondary tmw-btn-small tmw-stripe-portal-btn">
+                            <?php _e('View Billing', 'flavor-starter-flavor'); ?>
+                        </button>
+                    <?php else : ?>
+                        <a href="<?php echo esc_url($swpm_profile_url); ?>" class="tmw-btn tmw-btn-secondary tmw-btn-small">
+                            <?php _e('View Billing', 'flavor-starter-flavor'); ?>
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
 
@@ -148,9 +184,15 @@ get_header();
                 <div class="tmw-card-body">
                     <h3 class="h5 mb-2"><i class="fas fa-times-circle text-error"></i> <?php _e('Cancel Subscription', 'flavor-starter-flavor'); ?></h3>
                     <p class="text-muted text-sm mb-4"><?php _e('Your data will be kept if you resubscribe', 'flavor-starter-flavor'); ?></p>
-                    <a href="<?php echo esc_url($swpm_profile_url); ?>" class="tmw-btn tmw-btn-danger tmw-btn-small">
-                        <?php _e('Cancel Plan', 'flavor-starter-flavor'); ?>
-                    </a>
+                    <?php if (tmw_is_stripe_active()) : ?>
+                        <button type="button" class="tmw-btn tmw-btn-danger tmw-btn-small tmw-stripe-portal-btn">
+                            <?php _e('Cancel Plan', 'flavor-starter-flavor'); ?>
+                        </button>
+                    <?php else : ?>
+                        <a href="<?php echo esc_url($swpm_profile_url); ?>" class="tmw-btn tmw-btn-danger tmw-btn-small">
+                            <?php _e('Cancel Plan', 'flavor-starter-flavor'); ?>
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
 

@@ -99,6 +99,13 @@ get_header();
                         <span class="tmw-btn tmw-btn-primary tmw-btn-full" disabled><?php _e('Current Plan', 'flavor-starter-flavor'); ?></span>
                     <?php elseif ($current_tier === 'fleet') : ?>
                         <span class="tmw-btn tmw-btn-secondary tmw-btn-full" disabled><?php _e('Downgrade', 'flavor-starter-flavor'); ?></span>
+                    <?php elseif (tmw_is_stripe_active()) : ?>
+                        <button type="button" 
+                                class="tmw-btn tmw-btn-primary tmw-btn-full tmw-subscribe-btn" 
+                                data-tier="paid"
+                                data-period="monthly">
+                            <?php _e('Subscribe Now', 'flavor-starter-flavor'); ?>
+                        </button>
                     <?php else : ?>
                         <a href="<?php echo esc_url(tmw_get_swpm_join_url($paid_level_id)); ?>" class="tmw-btn tmw-btn-primary tmw-btn-full">
                             <?php _e('Subscribe Now', 'flavor-starter-flavor'); ?>
@@ -131,6 +138,13 @@ get_header();
                 <div class="tmw-pricing-footer">
                     <?php if ($current_tier === 'fleet') : ?>
                         <span class="tmw-btn tmw-btn-secondary tmw-btn-full" disabled><?php _e('Current Plan', 'flavor-starter-flavor'); ?></span>
+                    <?php elseif (tmw_is_stripe_active()) : ?>
+                        <button type="button" 
+                                class="tmw-btn tmw-btn-secondary tmw-btn-full tmw-subscribe-btn" 
+                                data-tier="fleet"
+                                data-period="monthly">
+                            <?php _e('Go Fleet', 'flavor-starter-flavor'); ?>
+                        </button>
                     <?php else : ?>
                         <a href="<?php echo esc_url(tmw_get_swpm_join_url($fleet_level_id)); ?>" class="tmw-btn tmw-btn-secondary tmw-btn-full">
                             <?php _e('Go Fleet', 'flavor-starter-flavor'); ?>
@@ -247,6 +261,37 @@ get_header();
 
     </div>
 </div>
+
+<?php if (tmw_is_stripe_active()) : ?>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Update Stripe subscribe buttons when pricing toggle changes
+    var toggle = document.querySelector('.tmw-pricing-switch');
+    if (toggle) {
+        toggle.addEventListener('click', function() {
+            // Wait for toggle animation/state change
+            setTimeout(function() {
+                var isYearly = toggle.classList.contains('active') || toggle.getAttribute('aria-pressed') === 'true';
+                var period = isYearly ? 'yearly' : 'monthly';
+                document.querySelectorAll('.tmw-subscribe-btn').forEach(function(btn) {
+                    btn.dataset.period = period;
+                });
+            }, 50);
+        });
+    }
+    
+    // Also handle the toggle labels
+    document.querySelectorAll('.tmw-pricing-toggle-label').forEach(function(label) {
+        label.addEventListener('click', function() {
+            var period = this.dataset.period || 'monthly';
+            document.querySelectorAll('.tmw-subscribe-btn').forEach(function(btn) {
+                btn.dataset.period = period;
+            });
+        });
+    });
+});
+</script>
+<?php endif; ?>
 
 <?php
 get_footer();

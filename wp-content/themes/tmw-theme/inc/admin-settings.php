@@ -388,6 +388,9 @@ function tmw_ajax_save_tier() {
         'color'         => sanitize_hex_color($data['color'] ?? '#6b7280') ?: '#6b7280',
     );
     
+    // Allow plugins to extend tier data (e.g., Stripe price IDs)
+    $tiers[$slug] = apply_filters('tmw_sanitize_tier_data', $tiers[$slug], $data, $slug);
+    
     if (!isset($tier_values[$slug])) {
         $limits = tmw_get_limit_definitions();
         $tier_values[$slug] = array();
@@ -572,8 +575,12 @@ function tmw_render_general_tab() {
                 <td>
                     <select id="membership_plugin" name="tmw_settings[membership_plugin]">
                         <option value="simple-membership" <?php selected($settings['membership_plugin'], 'simple-membership'); ?>>Simple Membership</option>
+                        <option value="stripe" <?php selected($settings['membership_plugin'], 'stripe'); ?>>Stripe Subscriptions</option>
                         <option value="user-meta" <?php selected($settings['membership_plugin'], 'user-meta'); ?>>User Meta Only</option>
                     </select>
+                    <p class="description">
+                        <?php _e('Select your subscription/membership plugin. Stripe requires the TMW Stripe Subscriptions plugin.', 'flavor-starter-flavor'); ?>
+                    </p>
                 </td>
             </tr>
         </table>
@@ -630,6 +637,10 @@ function tmw_render_tiers_tab() {
                 <tr><th><label for="tier-is-free">Is Free Tier?</label></th><td><label><input type="checkbox" id="tier-is-free"> This is a free/no-cost tier</label></td></tr>
                 <tr><th><label for="tier-order">Display Order</label></th><td><input type="number" id="tier-order" class="small-text" min="1" value="1"></td></tr>
                 <tr><th><label for="tier-color">Badge Color</label></th><td><input type="color" id="tier-color" value="#6b7280"></td></tr>
+                <?php
+                // Hook for additional tier fields (Stripe plugin uses this)
+                do_action('tmw_tier_modal_fields');
+                ?>
             </table>
             <input type="hidden" id="tier-original-slug" value="">
             <p class="tmw-modal-buttons">

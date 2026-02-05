@@ -79,8 +79,14 @@ get_header();
                             <i class="fas fa-arrow-up"></i>
                             <?php _e('Upgrade Plan', 'flavor-starter-flavor'); ?>
                         </a>
+                    <?php elseif (tmw_is_stripe_active()) : ?>
+                        <button type="button" class="tmw-btn tmw-btn-secondary tmw-stripe-portal-btn">
+                            <i class="fas fa-cog"></i>
+                            <?php _e('Manage Subscription', 'flavor-starter-flavor'); ?>
+                        </button>
                     <?php else : ?>
-                        <a href="<?php echo esc_url(tmw_get_swpm_profile_url()); ?>" class="tmw-btn tmw-btn-secondary" style="display:none">
+                        <a href="<?php echo esc_url(tmw_get_swpm_profile_url()); ?>" class="tmw-btn tmw-btn-secondary">
+                            <i class="fas fa-cog"></i>
                             <?php _e('Manage Subscription', 'flavor-starter-flavor'); ?>
                         </a>
                     <?php endif; ?>

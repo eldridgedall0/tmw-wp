@@ -606,3 +606,72 @@ function tmw_subscription_changed($user_id, $old_tier, $new_tier) {
     update_user_meta($user_id, 'tmw_subscription_tier', $new_tier);
     update_user_meta($user_id, 'tmw_tier_changed', current_time('mysql'));
 }
+
+// =============================================================================
+// GENERIC SUBSCRIPTION URL HELPERS
+// These functions work with any membership plugin based on settings
+// =============================================================================
+
+/**
+ * Check if current membership plugin is Stripe
+ *
+ * @return bool
+ */
+function tmw_is_stripe_active() {
+    $plugin = tmw_get_setting('membership_plugin', 'simple-membership');
+    return $plugin === 'stripe' && defined('TMW_STRIPE_VERSION');
+}
+
+/**
+ * Get subscribe/checkout URL for a tier
+ * Works with any membership plugin based on settings
+ *
+ * @param string $tier_slug Tier slug
+ * @param string $period 'monthly' or 'yearly'
+ * @return string URL
+ */
+function tmw_get_subscribe_url($tier_slug, $period = 'monthly') {
+    $plugin = tmw_get_setting('membership_plugin', 'simple-membership');
+
+    switch ($plugin) {
+        case 'stripe':
+            // For Stripe, return # - JavaScript handles checkout via AJAX
+            return '#';
+
+        case 'simple-membership':
+        default:
+            $tier = tmw_get_tier($tier_slug);
+            $level_id = $tier['swpm_level_id'] ?? 0;
+            return tmw_get_swpm_join_url($level_id);
+    }
+}
+
+/**
+ * Get subscription management URL
+ * Works with any membership plugin based on settings
+ *
+ * @return string URL
+ */
+function tmw_get_manage_subscription_url() {
+    $plugin = tmw_get_setting('membership_plugin', 'simple-membership');
+
+    switch ($plugin) {
+        case 'stripe':
+            // For Stripe, return # - JavaScript handles portal redirect via AJAX
+            return '#';
+
+        case 'simple-membership':
+        default:
+            return tmw_get_swpm_profile_url();
+    }
+}
+
+/**
+ * Get cancel subscription URL
+ * For Stripe, this redirects to portal where cancel is handled
+ *
+ * @return string URL
+ */
+function tmw_get_cancel_subscription_url() {
+    return tmw_get_manage_subscription_url();
+}

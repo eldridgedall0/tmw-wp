@@ -92,22 +92,22 @@ function tmw_get_membership_adapter() {
             $adapter = new TMW_MemberPress_Adapter();
             break;
 
+        case 'stripe':
+            // Load Stripe adapter from plugin if active
+            if (class_exists('TMW_Stripe_Adapter')) {
+                $adapter = new TMW_Stripe_Adapter();
+            } else {
+                // Fallback to user-meta if plugin not active
+                require_once TMW_THEME_DIR . '/inc/adapters/user-meta.php';
+                $adapter = new TMW_User_Meta_Adapter();
+            }
+            break;
+
         case 'user-meta':
         default:
             require_once TMW_THEME_DIR . '/inc/adapters/user-meta.php';
             $adapter = new TMW_User_Meta_Adapter();
             break;
-			
-		case 'stripe':
-    	// Load Stripe adapter from plugin if active
-    		if (class_exists('TMW_Stripe_Adapter')) {
-        		$adapter = new TMW_Stripe_Adapter();
-    		} else {
-        		// Fallback to user-meta if plugin not active
-        		require_once TMW_THEME_DIR . '/inc/adapters/user-meta.php';
-        		$adapter = new TMW_User_Meta_Adapter();
-    		}
-    		break;
     }
 
     // Verify plugin is active
