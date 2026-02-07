@@ -861,7 +861,7 @@ function tmw_render_admin_scripts() {
             var s=$('#tier-slug').val().toLowerCase().replace(/[^a-z0-9_-]/g,'');
             if(!s){alert('Slug required');return}
 			var tpm=$('#tier-stripe-price-monthly').val();
-			if(!tpm){alert('tpm required');return}
+			if(tpm){alert('tpm required');return}
             $.post(ajaxurl,{action:'tmw_save_tier',nonce:nonce,slug:s,original_slug:$('#tier-original-slug').val(),
                 data:{
                     name:$('#tier-name').val(),
