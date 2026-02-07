@@ -9,12 +9,8 @@
 $current_tier = is_user_logged_in() ? tmw_get_user_tier() : 'none';
 $comparison = tmw_get_feature_comparison();
 
-// Get tier data with pricing (uses tmw_get_tiers_with_pricing if available)
-if (function_exists('tmw_get_tiers_with_pricing')) {
-    $tiers = tmw_get_tiers_with_pricing();
-} else {
-    $tiers = tmw_get_tiers();
-}
+// Get tier data
+$tiers = tmw_get_tiers();
 $free_tier = $tiers['free'] ?? array();
 $paid_tier = $tiers['paid'] ?? array();
 $fleet_tier = $tiers['fleet'] ?? array();
