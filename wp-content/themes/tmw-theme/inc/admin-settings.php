@@ -386,6 +386,7 @@ function tmw_ajax_save_tier() {
         'is_free'                 => !empty($data['is_free']),
         'order'                   => absint($data['order'] ?? count($tiers) + 1),
         'color'                   => sanitize_hex_color($data['color'] ?? '#6b7280') ?: '#6b7280',
+		'test' => 'test',
         // Pricing fields
         'price_monthly'           => floatval($data['price_monthly'] ?? 0),
         'price_yearly'            => floatval($data['price_yearly'] ?? 0),
@@ -860,7 +861,6 @@ function tmw_render_admin_scripts() {
         $('#tmw-save-tier').on('click',function(){
             var s=$('#tier-slug').val().toLowerCase().replace(/[^a-z0-9_-]/g,'');
             if(!s){alert('Slug required');return}
-			var tpm=$('#tier-stripe-price-monthly').val();
             $.post(ajaxurl,{action:'tmw_save_tier',nonce:nonce,slug:s,original_slug:$('#tier-original-slug').val(),
                 data:{
                     name:$('#tier-name').val(),
@@ -875,7 +875,7 @@ function tmw_render_admin_scripts() {
                     stripe_price_id_yearly:$('#tier-stripe-price-yearly').val(),
                     stripe_product_id:$('#tier-stripe-product-id').val()
                 }
-            },function(r){if(r.success)alert(tpm);return;else alert(r.data||'Error')});
+            },function(r){if(r.success)location.reload();else alert(r.data||'Error')});
         });
         $(document).on('click','.tmw-delete-tier',function(){
             if(!confirm('Delete this tier?'))return;
