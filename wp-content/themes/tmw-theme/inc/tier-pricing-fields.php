@@ -72,26 +72,26 @@ function tmw_render_tier_pricing_fields() {
     </tr>
     
     <!-- Stripe Fields -->
-    <tr class="tmw-stripe-field" style="<?php echo $show_stripe ? '' : 'display:none;'; ?>">
+    <tr class="tmw-stripe-field" >
         <th colspan="2" style="padding-bottom:0;">
             <h4 style="margin:0;border-top:1px solid #ddd;padding-top:15px;">Stripe Configuration</h4>
         </th>
     </tr>
-    <tr class="tmw-stripe-field" style="<?php echo $show_stripe ? '' : 'display:none;'; ?>">
+    <tr class="tmw-stripe-field" >
         <th><label for="tier-stripe-price-monthly">Stripe Monthly Price ID</label></th>
         <td>
             <input type="text" id="tier-stripe-price-monthly" class="regular-text" placeholder="price_xxxxxxxxxxxxx">
             <p class="description">From Stripe Dashboard → Products → Price ID</p>
         </td>
     </tr>
-    <tr class="tmw-stripe-field" style="<?php echo $show_stripe ? '' : 'display:none;'; ?>">
+    <tr class="tmw-stripe-field">
         <th><label for="tier-stripe-price-yearly">Stripe Yearly Price ID</label></th>
         <td>
             <input type="text" id="tier-stripe-price-yearly" class="regular-text" placeholder="price_yyyyyyyyyyyyy">
             <p class="description">Optional - for yearly billing</p>
         </td>
     </tr>
-    <tr class="tmw-stripe-field" style="<?php echo $show_stripe ? '' : 'display:none;'; ?>">
+    <tr class="tmw-stripe-field">
         <th><label for="tier-stripe-product-id">Stripe Product ID</label></th>
         <td>
             <input type="text" id="tier-stripe-product-id" class="regular-text" placeholder="prod_zzzzzzzzzzzzz">
