@@ -385,14 +385,7 @@ function tmw_ajax_save_tier() {
         'swpm_level_id'           => absint($data['swpm_level_id'] ?? 0),
         'is_free'                 => !empty($data['is_free']),
         'order'                   => absint($data['order'] ?? count($tiers) + 1),
-        // 'color'                   => sanitize_hex_color($data['color'] ?? '#6b7280') ?: '#6b7280',
-        // Pricing fields
-        'price_monthly'           => floatval($data['price_monthly'] ?? 0),
-        'price_yearly'            => floatval($data['price_yearly'] ?? 0),
-        // Stripe fields
-        'stripe_price_id_monthly' => sanitize_text_field($data['stripe_price_id_monthly'] ?? ''),
-        'stripe_price_id_yearly'  => sanitize_text_field($data['stripe_price_id_yearly'] ?? ''),
-        'stripe_product_id'       => sanitize_text_field($data['stripe_product_id'] ?? ''),
+        'color'                   => sanitize_hex_color($data['color'] ?? '#6b7280') ?: '#6b7280',
     );
     
     // Allow plugins to extend tier data (for backwards compatibility)
