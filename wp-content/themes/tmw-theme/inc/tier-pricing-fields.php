@@ -123,15 +123,6 @@ function tmw_tier_pricing_admin_scripts() {
         // Pricing data from PHP
         var pricingData = typeof tmwTierPricing !== 'undefined' ? tmwTierPricing : {};
         
-        // Toggle Stripe fields based on membership plugin
-        function toggleStripeFields() {
-            var plugin = $('#membership_plugin').val();
-            if (plugin === 'stripe') {
-                $('.tmw-stripe-field').show();
-            } else {
-                $('.tmw-stripe-field').hide();
-            }
-        }
         
         // Initial toggle
         toggleStripeFields();
