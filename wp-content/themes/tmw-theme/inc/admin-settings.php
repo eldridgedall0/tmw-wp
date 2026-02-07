@@ -380,15 +380,22 @@ function tmw_ajax_save_tier() {
     }
     
     $tiers[$slug] = array(
-        'name'          => sanitize_text_field($data['name'] ?? ucfirst($slug)),
-        'description'   => sanitize_text_field($data['description'] ?? ''),
-        'swpm_level_id' => absint($data['swpm_level_id'] ?? 0),
-        'is_free'       => !empty($data['is_free']),
-        'order'         => absint($data['order'] ?? count($tiers) + 1),
-        'color'         => sanitize_hex_color($data['color'] ?? '#6b7280') ?: '#6b7280',
+        'name'                    => sanitize_text_field($data['name'] ?? ucfirst($slug)),
+        'description'             => sanitize_text_field($data['description'] ?? ''),
+        'swpm_level_id'           => absint($data['swpm_level_id'] ?? 0),
+        'is_free'                 => !empty($data['is_free']),
+        'order'                   => absint($data['order'] ?? count($tiers) + 1),
+        'color'                   => sanitize_hex_color($data['color'] ?? '#6b7280') ?: '#6b7280',
+        // Pricing fields
+        'price_monthly'           => floatval($data['price_monthly'] ?? 0),
+        'price_yearly'            => floatval($data['price_yearly'] ?? 0),
+        // Stripe fields
+        'stripe_price_id_monthly' => sanitize_text_field($data['stripe_price_id_monthly'] ?? ''),
+        'stripe_price_id_yearly'  => sanitize_text_field($data['stripe_price_id_yearly'] ?? ''),
+        'stripe_product_id'       => sanitize_text_field($data['stripe_product_id'] ?? ''),
     );
     
-    // Allow plugins to extend tier data (e.g., Stripe price IDs)
+    // Allow plugins to extend tier data (for backwards compatibility)
     $tiers[$slug] = apply_filters('tmw_sanitize_tier_data', $tiers[$slug], $data, $slug);
     
     if (!isset($tier_values[$slug])) {
@@ -603,18 +610,34 @@ function tmw_render_tiers_tab() {
                 <th style="width:80px;">SWPM ID</th>
                 <th style="width:60px;">Free?</th>
                 <th style="width:60px;">Color</th>
+                <th style="width:80px;">Price</th>
                 <th style="width:120px;">Actions</th>
             </tr>
         </thead>
         <tbody>
             <?php foreach ($tiers as $slug => $tier) : ?>
-            <tr data-slug="<?php echo esc_attr($slug); ?>">
+            <tr data-slug="<?php echo esc_attr($slug); ?>"
+                data-name="<?php echo esc_attr($tier['name']); ?>"
+                data-description="<?php echo esc_attr($tier['description'] ?? ''); ?>"
+                data-swpm-level-id="<?php echo esc_attr($tier['swpm_level_id'] ?? 0); ?>"
+                data-is-free="<?php echo $tier['is_free'] ? '1' : '0'; ?>"
+                data-order="<?php echo esc_attr($tier['order'] ?? 1); ?>"
+                data-color="<?php echo esc_attr($tier['color'] ?? '#6b7280'); ?>"
+                data-price-monthly="<?php echo esc_attr($tier['price_monthly'] ?? 0); ?>"
+                data-price-yearly="<?php echo esc_attr($tier['price_yearly'] ?? 0); ?>"
+                data-stripe-price-monthly="<?php echo esc_attr($tier['stripe_price_id_monthly'] ?? ''); ?>"
+                data-stripe-price-yearly="<?php echo esc_attr($tier['stripe_price_id_yearly'] ?? ''); ?>"
+                data-stripe-product-id="<?php echo esc_attr($tier['stripe_product_id'] ?? ''); ?>">
                 <td><input type="number" class="small-text tier-order" value="<?php echo esc_attr($tier['order']); ?>" min="1" style="width:50px;"></td>
                 <td><code><?php echo esc_html($slug); ?></code></td>
                 <td><strong><?php echo esc_html($tier['name']); ?></strong><br><small><?php echo esc_html($tier['description']); ?></small></td>
                 <td><?php echo esc_html($tier['swpm_level_id']); ?></td>
                 <td><?php echo $tier['is_free'] ? '✓' : '—'; ?></td>
                 <td><span style="display:inline-block;width:20px;height:20px;background:<?php echo esc_attr($tier['color']); ?>;border-radius:3px;"></span></td>
+                <td><?php 
+                    $price = $tier['price_monthly'] ?? 0;
+                    echo $price > 0 ? '$' . number_format($price, 2) : '—';
+                ?></td>
                 <td>
                     <button type="button" class="button button-small tmw-edit-tier">Edit</button>
                     <button type="button" class="button button-small button-link-delete tmw-delete-tier">Delete</button>
@@ -637,10 +660,38 @@ function tmw_render_tiers_tab() {
                 <tr><th><label for="tier-is-free">Is Free Tier?</label></th><td><label><input type="checkbox" id="tier-is-free"> This is a free/no-cost tier</label></td></tr>
                 <tr><th><label for="tier-order">Display Order</label></th><td><input type="number" id="tier-order" class="small-text" min="1" value="1"></td></tr>
                 <tr><th><label for="tier-color">Badge Color</label></th><td><input type="color" id="tier-color" value="#6b7280"></td></tr>
+                
+                <!-- Pricing Fields -->
+                <tr><th colspan="2" style="padding-bottom:0;"><h4 style="margin:0;border-top:1px solid #ddd;padding-top:15px;"><?php _e('Pricing', 'flavor-starter-flavor'); ?></h4></th></tr>
+                <tr>
+                    <th><label for="tier-price-monthly"><?php _e('Monthly Price ($)', 'flavor-starter-flavor'); ?></label></th>
+                    <td><input type="number" id="tier-price-monthly" class="small-text" min="0" step="0.01" value="0"><p class="description"><?php _e('Display price for pricing page', 'flavor-starter-flavor'); ?></p></td>
+                </tr>
+                <tr>
+                    <th><label for="tier-price-yearly"><?php _e('Yearly Price ($)', 'flavor-starter-flavor'); ?></label></th>
+                    <td><input type="number" id="tier-price-yearly" class="small-text" min="0" step="0.01" value="0"><p class="description"><?php _e('Display price for yearly billing', 'flavor-starter-flavor'); ?></p></td>
+                </tr>
+                
                 <?php
-                // Hook for additional tier fields (Stripe plugin uses this)
-                do_action('tmw_tier_modal_fields');
+                // Stripe fields - only show if Stripe is selected as membership plugin
+                $membership_plugin = tmw_get_setting('membership_plugin', 'simple-membership');
+                $show_stripe = ($membership_plugin === 'stripe');
                 ?>
+                <tr class="tmw-stripe-field" style="<?php echo $show_stripe ? '' : 'display:none;'; ?>">
+                    <th colspan="2" style="padding-bottom:0;"><h4 style="margin:0;border-top:1px solid #ddd;padding-top:15px;"><?php _e('Stripe Configuration', 'flavor-starter-flavor'); ?></h4></th>
+                </tr>
+                <tr class="tmw-stripe-field" style="<?php echo $show_stripe ? '' : 'display:none;'; ?>">
+                    <th><label for="tier-stripe-price-monthly"><?php _e('Stripe Monthly Price ID', 'flavor-starter-flavor'); ?></label></th>
+                    <td><input type="text" id="tier-stripe-price-monthly" class="regular-text" placeholder="price_xxxxxxxxxxxxx"><p class="description"><?php _e('From Stripe Dashboard → Products → Price ID', 'flavor-starter-flavor'); ?></p></td>
+                </tr>
+                <tr class="tmw-stripe-field" style="<?php echo $show_stripe ? '' : 'display:none;'; ?>">
+                    <th><label for="tier-stripe-price-yearly"><?php _e('Stripe Yearly Price ID', 'flavor-starter-flavor'); ?></label></th>
+                    <td><input type="text" id="tier-stripe-price-yearly" class="regular-text" placeholder="price_yyyyyyyyyyyyy"><p class="description"><?php _e('Optional - for yearly billing', 'flavor-starter-flavor'); ?></p></td>
+                </tr>
+                <tr class="tmw-stripe-field" style="<?php echo $show_stripe ? '' : 'display:none;'; ?>">
+                    <th><label for="tier-stripe-product-id"><?php _e('Stripe Product ID', 'flavor-starter-flavor'); ?></label></th>
+                    <td><input type="text" id="tier-stripe-product-id" class="regular-text" placeholder="prod_zzzzzzzzzzzzz"><p class="description"><?php _e('Optional - for reference', 'flavor-starter-flavor'); ?></p></td>
+                </tr>
             </table>
             <input type="hidden" id="tier-original-slug" value="">
             <p class="tmw-modal-buttons">
@@ -777,26 +828,52 @@ function tmw_render_admin_scripts() {
             $('#tier-swpm-level').val(0);$('#tier-is-free').prop('checked',false);
             $('#tier-order').val($('#tmw-tiers-table tbody tr').length+1);
             $('#tier-color').val('#6b7280');$('#tier-original-slug').val('');
+            // Clear pricing fields
+            $('#tier-price-monthly').val(0);
+            $('#tier-price-yearly').val(0);
+            // Clear Stripe fields
+            $('#tier-stripe-price-monthly').val('');
+            $('#tier-stripe-price-yearly').val('');
+            $('#tier-stripe-product-id').val('');
             openModal('#tmw-tier-modal');
         });
         $(document).on('click','.tmw-edit-tier',function(){
             var $r=$(this).closest('tr'),s=$r.data('slug');
             $('#tmw-tier-modal-title').text('Edit Tier');
             $('#tier-slug').val(s).prop('readonly',true);
-            $('#tier-name').val($r.find('td:eq(2) strong').text());
-            $('#tier-description').val($r.find('td:eq(2) small').text());
-            $('#tier-swpm-level').val($r.find('td:eq(3)').text());
-            $('#tier-is-free').prop('checked',$r.find('td:eq(4)').text().trim()==='✓');
-            $('#tier-order').val($r.find('.tier-order').val());
-            $('#tier-color').val(rgbToHex($r.find('td:eq(5) span').css('background-color')));
+            // Read from data attributes
+            $('#tier-name').val($r.data('name'));
+            $('#tier-description').val($r.data('description'));
+            $('#tier-swpm-level').val($r.data('swpm-level-id'));
+            $('#tier-is-free').prop('checked',$r.data('is-free')==='1'||$r.data('is-free')===1);
+            $('#tier-order').val($r.data('order'));
+            $('#tier-color').val($r.data('color'));
+            // Pricing fields
+            $('#tier-price-monthly').val($r.data('price-monthly')||0);
+            $('#tier-price-yearly').val($r.data('price-yearly')||0);
+            // Stripe fields
+            $('#tier-stripe-price-monthly').val($r.data('stripe-price-monthly')||'');
+            $('#tier-stripe-price-yearly').val($r.data('stripe-price-yearly')||'');
+            $('#tier-stripe-product-id').val($r.data('stripe-product-id')||'');
             $('#tier-original-slug').val(s);openModal('#tmw-tier-modal');
         });
         $('#tmw-save-tier').on('click',function(){
             var s=$('#tier-slug').val().toLowerCase().replace(/[^a-z0-9_-]/g,'');
             if(!s){alert('Slug required');return}
             $.post(ajaxurl,{action:'tmw_save_tier',nonce:nonce,slug:s,original_slug:$('#tier-original-slug').val(),
-                data:{name:$('#tier-name').val(),description:$('#tier-description').val(),swpm_level_id:$('#tier-swpm-level').val(),
-                    is_free:$('#tier-is-free').is(':checked')?1:0,order:$('#tier-order').val(),color:$('#tier-color').val()}
+                data:{
+                    name:$('#tier-name').val(),
+                    description:$('#tier-description').val(),
+                    swpm_level_id:$('#tier-swpm-level').val(),
+                    is_free:$('#tier-is-free').is(':checked')?1:0,
+                    order:$('#tier-order').val(),
+                    color:$('#tier-color').val(),
+                    price_monthly:$('#tier-price-monthly').val(),
+                    price_yearly:$('#tier-price-yearly').val(),
+                    stripe_price_id_monthly:$('#tier-stripe-price-monthly').val(),
+                    stripe_price_id_yearly:$('#tier-stripe-price-yearly').val(),
+                    stripe_product_id:$('#tier-stripe-product-id').val()
+                }
             },function(r){if(r.success)location.reload();else alert(r.data||'Error')});
         });
         $(document).on('click','.tmw-delete-tier',function(){
