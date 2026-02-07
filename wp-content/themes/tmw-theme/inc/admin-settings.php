@@ -385,8 +385,7 @@ function tmw_ajax_save_tier() {
         'swpm_level_id'           => absint($data['swpm_level_id'] ?? 0),
         'is_free'                 => !empty($data['is_free']),
         'order'                   => absint($data['order'] ?? count($tiers) + 1),
-        'color'                   => sanitize_hex_color($data['color'] ?? '#6b7280') ?: '#6b7280',
-		'test' => 'test',
+        // 'color'                   => sanitize_hex_color($data['color'] ?? '#6b7280') ?: '#6b7280',
         // Pricing fields
         'price_monthly'           => floatval($data['price_monthly'] ?? 0),
         'price_yearly'            => floatval($data['price_yearly'] ?? 0),
