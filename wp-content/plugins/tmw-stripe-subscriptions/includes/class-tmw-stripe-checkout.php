@@ -43,7 +43,13 @@ class TMW_Stripe_Checkout {
             wp_send_json_error(array('message' => __('Theme not properly configured.', 'tmw-stripe-subscriptions')));
         }
 
-        $tier = tmw_get_tier($tier_slug);
+        // Get tier with pricing data merged
+        // Use tmw_get_tier_with_pricing if available (from tier-pricing-fields.php)
+        if (function_exists('tmw_get_tier_with_pricing')) {
+            $tier = tmw_get_tier_with_pricing($tier_slug);
+        } else {
+            $tier = tmw_get_tier($tier_slug);
+        }
 
         if (!$tier) {
             wp_send_json_error(array('message' => __('Invalid tier.', 'tmw-stripe-subscriptions')));
