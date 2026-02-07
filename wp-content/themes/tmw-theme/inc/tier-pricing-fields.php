@@ -43,8 +43,6 @@ function tmw_get_tier_price($tier_slug, $field = null) {
  * Hooks into: tmw_tier_modal_fields (if it exists) or admin_footer
  */
 function tmw_render_tier_pricing_fields() {
-    $membership_plugin = tmw_get_setting('membership_plugin', 'simple-membership');
-    $show_stripe = ($membership_plugin === 'stripe');
     
     // Get all pricing data for JavaScript
     $pricing_data = tmw_get_tier_pricing();
@@ -69,7 +67,7 @@ function tmw_render_tier_pricing_fields() {
             <input type="number" id="tier-price-yearly" class="small-text" min="0" step="0.01" value="0">
             <p class="description">Display price for yearly billing</p>
         </td>
-    </tr>test
+    </tr>
     
     <!-- Stripe Fields -->
     <tr class="tmw-stripe-field" >
@@ -115,6 +113,7 @@ function tmw_tier_pricing_admin_scripts() {
     if (!$screen || strpos($screen->id, 'tmw-settings') === false) {
         return;
     }
+	$membership_plugin = tmw_get_setting('membership_plugin', 'simple-membership');
     ?>
     <script>
     jQuery(document).ready(function($) {
@@ -123,7 +122,8 @@ function tmw_tier_pricing_admin_scripts() {
         
         // Toggle Stripe fields based on membership plugin
         function toggleStripeFields() {
-            var plugin = $('#membership_plugin').val();
+			
+            var plugin = <?php echo $membership_plugin; ?>;
             if (plugin === 'stripe') {
                 $('.tmw-stripe-field').show();
             } else {
