@@ -43,9 +43,7 @@ function tmw_get_tier_price($tier_slug, $field = null) {
  * Hooks into: tmw_tier_modal_fields (if it exists) or admin_footer
  */
 function tmw_render_tier_pricing_fields() {
-    $membership_plugin = function_exists('tmw_get_setting') 
-        ? tmw_get_setting('membership_plugin', 'simple-membership') 
-        : 'simple-membership';
+    $membership_plugin = tmw_get_setting('membership_plugin', 'simple-membership');
     $show_stripe = ($membership_plugin === 'stripe');
     
     // Get all pricing data for JavaScript
