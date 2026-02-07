@@ -9,6 +9,18 @@
 $current_tier = is_user_logged_in() ? tmw_get_user_tier() : 'none';
 $comparison = tmw_get_feature_comparison();
 
+// Get tier data
+$tiers = tmw_get_tiers();
+$free_tier = $tiers['free'] ?? array();
+$paid_tier = $tiers['paid'] ?? array();
+$fleet_tier = $tiers['fleet'] ?? array();
+
+// Get prices from tier settings (with fallbacks)
+$paid_price_monthly = $paid_tier['price_monthly'] ?? 9;
+$paid_price_yearly = $paid_tier['price_yearly'] ?? 86;
+$fleet_price_monthly = $fleet_tier['price_monthly'] ?? 29;
+$fleet_price_yearly = $fleet_tier['price_yearly'] ?? 278;
+
 // Get level IDs from settings for SWPM join URLs
 $paid_level_id = tmw_get_level_mapping('paid_level_id', 2);
 $fleet_level_id = tmw_get_level_mapping('fleet_level_id', 3);
@@ -47,7 +59,7 @@ get_header();
             <!-- Free Tier -->
             <div class="tmw-pricing-card <?php echo $current_tier === 'free' ? 'tmw-pricing-current' : ''; ?>">
                 <div class="tmw-pricing-header">
-                    <h3 class="tmw-pricing-name"><?php _e('Free', 'flavor-starter-flavor'); ?></h3>
+                    <h3 class="tmw-pricing-name"><?php echo esc_html($free_tier['name'] ?? __('Free', 'flavor-starter-flavor')); ?></h3>
                     <div class="tmw-pricing-price">
                         <span class="tmw-pricing-currency">$</span>
                         <span class="tmw-pricing-amount" data-price-monthly="0" data-price-yearly="0">0</span>
@@ -79,10 +91,10 @@ get_header();
             <div class="tmw-pricing-card tmw-pricing-popular <?php echo $current_tier === 'paid' ? 'tmw-pricing-current' : ''; ?>">
                 <div class="tmw-pricing-badge"><?php _e('Most Popular', 'flavor-starter-flavor'); ?></div>
                 <div class="tmw-pricing-header">
-                    <h3 class="tmw-pricing-name"><?php _e('Paid', 'flavor-starter-flavor'); ?></h3>
+                    <h3 class="tmw-pricing-name"><?php echo esc_html($paid_tier['name'] ?? __('Paid', 'flavor-starter-flavor')); ?></h3>
                     <div class="tmw-pricing-price">
                         <span class="tmw-pricing-currency">$</span>
-                        <span class="tmw-pricing-amount" data-price-monthly="9" data-price-yearly="86">9</span>
+                        <span class="tmw-pricing-amount" data-price-monthly="<?php echo esc_attr($paid_price_monthly); ?>" data-price-yearly="<?php echo esc_attr($paid_price_yearly); ?>"><?php echo esc_html($paid_price_monthly); ?></span>
                         <span class="tmw-pricing-period">/month</span>
                     </div>
                 </div>
@@ -117,10 +129,10 @@ get_header();
             <!-- Fleet Tier -->
             <div class="tmw-pricing-card <?php echo $current_tier === 'fleet' ? 'tmw-pricing-current' : ''; ?>">
                 <div class="tmw-pricing-header">
-                    <h3 class="tmw-pricing-name"><?php _e('Fleet', 'flavor-starter-flavor'); ?></h3>
+                    <h3 class="tmw-pricing-name"><?php echo esc_html($fleet_tier['name'] ?? __('Fleet', 'flavor-starter-flavor')); ?></h3>
                     <div class="tmw-pricing-price">
                         <span class="tmw-pricing-currency">$</span>
-                        <span class="tmw-pricing-amount" data-price-monthly="29" data-price-yearly="278">29</span>
+                        <span class="tmw-pricing-amount" data-price-monthly="<?php echo esc_attr($fleet_price_monthly); ?>" data-price-yearly="<?php echo esc_attr($fleet_price_yearly); ?>"><?php echo esc_html($fleet_price_monthly); ?></span>
                         <span class="tmw-pricing-period">/month</span>
                     </div>
                 </div>
