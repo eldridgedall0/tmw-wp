@@ -43,6 +43,10 @@ function tmw_get_tier_price($tier_slug, $field = null) {
  * Hooks into: tmw_tier_modal_fields (if it exists) or admin_footer
  */
 function tmw_render_tier_pricing_fields() {
+    $membership_plugin = function_exists('tmw_get_setting') 
+        ? tmw_get_setting('membership_plugin', 'simple-membership') 
+        : 'simple-membership';
+    $show_stripe = ($membership_plugin === 'stripe');
     
     // Get all pricing data for JavaScript
     $pricing_data = tmw_get_tier_pricing();
@@ -70,26 +74,26 @@ function tmw_render_tier_pricing_fields() {
     </tr>
     
     <!-- Stripe Fields -->
-    <tr class="tmw-stripe-field" >
+    <tr class="tmw-stripe-field" style="<?php echo $show_stripe ? '' : 'display:none;'; ?>">
         <th colspan="2" style="padding-bottom:0;">
             <h4 style="margin:0;border-top:1px solid #ddd;padding-top:15px;">Stripe Configuration</h4>
         </th>
     </tr>
-    <tr class="tmw-stripe-field" >
+    <tr class="tmw-stripe-field" style="<?php echo $show_stripe ? '' : 'display:none;'; ?>">
         <th><label for="tier-stripe-price-monthly">Stripe Monthly Price ID</label></th>
         <td>
             <input type="text" id="tier-stripe-price-monthly" class="regular-text" placeholder="price_xxxxxxxxxxxxx">
             <p class="description">From Stripe Dashboard → Products → Price ID</p>
         </td>
     </tr>
-    <tr class="tmw-stripe-field">
+    <tr class="tmw-stripe-field" style="<?php echo $show_stripe ? '' : 'display:none;'; ?>">
         <th><label for="tier-stripe-price-yearly">Stripe Yearly Price ID</label></th>
         <td>
             <input type="text" id="tier-stripe-price-yearly" class="regular-text" placeholder="price_yyyyyyyyyyyyy">
             <p class="description">Optional - for yearly billing</p>
         </td>
     </tr>
-    <tr class="tmw-stripe-field">
+    <tr class="tmw-stripe-field" style="<?php echo $show_stripe ? '' : 'display:none;'; ?>">
         <th><label for="tier-stripe-product-id">Stripe Product ID</label></th>
         <td>
             <input type="text" id="tier-stripe-product-id" class="regular-text" placeholder="prod_zzzzzzzzzzzzz">
@@ -113,7 +117,6 @@ function tmw_tier_pricing_admin_scripts() {
     if (!$screen || strpos($screen->id, 'tmw-settings') === false) {
         return;
     }
-	$membership_plugin = tmw_get_setting('membership_plugin', 'simple-membership');
     ?>
     <script>
     jQuery(document).ready(function($) {
@@ -122,8 +125,7 @@ function tmw_tier_pricing_admin_scripts() {
         
         // Toggle Stripe fields based on membership plugin
         function toggleStripeFields() {
-			
-            var plugin = <?php echo $membership_plugin; ?>;
+            var plugin = $('#membership_plugin').val();
             if (plugin === 'stripe') {
                 $('.tmw-stripe-field').show();
             } else {
