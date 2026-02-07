@@ -73,7 +73,6 @@ function tmw_stripe_load_files() {
 
     // Admin classes
     require_once TMW_STRIPE_PLUGIN_DIR . 'admin/class-tmw-stripe-admin.php';
-    require_once TMW_STRIPE_PLUGIN_DIR . 'admin/class-tmw-stripe-settings.php';
     require_once TMW_STRIPE_PLUGIN_DIR . 'admin/class-tmw-stripe-subscribers.php';
 
     // Public classes
@@ -104,7 +103,6 @@ add_action('plugins_loaded', 'tmw_stripe_init');
  */
 function tmw_stripe_admin_init() {
     $admin = new TMW_Stripe_Admin();
-    $settings = new TMW_Stripe_Settings();
 
     // Register admin menu
     add_action('admin_menu', array($admin, 'add_admin_menu'));
@@ -115,13 +113,9 @@ function tmw_stripe_admin_init() {
     // Plugin action links on plugins page
     add_filter('plugin_action_links_' . TMW_STRIPE_PLUGIN_BASENAME, array($admin, 'add_plugin_action_links'));
 
-    // AJAX handlers for settings
-    add_action('wp_ajax_tmw_save_stripe_settings', array($settings, 'ajax_save_settings'));
-    add_action('wp_ajax_tmw_test_stripe_connection', array($settings, 'ajax_test_connection'));
-
-    // Tier modal Stripe fields (for TMW theme integration)
-    add_action('tmw_tier_modal_fields', array($settings, 'render_tier_stripe_fields'));
-    add_action('admin_footer', array($settings, 'render_tier_fields_script'));
+    // AJAX handlers for plugin settings page
+    add_action('wp_ajax_tmw_save_stripe_settings', 'tmw_stripe_ajax_save_settings');
+    add_action('wp_ajax_tmw_test_stripe_connection', 'tmw_stripe_ajax_test_connection');
 }
 
 /**
@@ -148,6 +142,58 @@ function tmw_stripe_public_init() {
 
     // REST API webhook endpoint
     add_action('rest_api_init', array($webhook, 'register_endpoint'));
+}
+
+/**
+ * AJAX handler for saving Stripe settings
+ */
+function tmw_stripe_ajax_save_settings() {
+    check_ajax_referer('tmw_stripe_admin', 'nonce');
+
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error('Unauthorized');
+    }
+
+    $settings = array(
+        'mode'                 => sanitize_text_field($_POST['mode'] ?? 'test'),
+        'test_publishable_key' => sanitize_text_field($_POST['test_publishable_key'] ?? ''),
+        'test_secret_key'      => sanitize_text_field($_POST['test_secret_key'] ?? ''),
+        'test_webhook_secret'  => sanitize_text_field($_POST['test_webhook_secret'] ?? ''),
+        'live_publishable_key' => sanitize_text_field($_POST['live_publishable_key'] ?? ''),
+        'live_secret_key'      => sanitize_text_field($_POST['live_secret_key'] ?? ''),
+        'live_webhook_secret'  => sanitize_text_field($_POST['live_webhook_secret'] ?? ''),
+        'success_url'          => esc_url_raw($_POST['success_url'] ?? ''),
+        'cancel_url'           => esc_url_raw($_POST['cancel_url'] ?? ''),
+    );
+
+    update_option('tmw_stripe_settings', $settings);
+
+    wp_send_json_success(array('message' => 'Settings saved successfully'));
+}
+
+/**
+ * AJAX handler for testing Stripe connection
+ */
+function tmw_stripe_ajax_test_connection() {
+    check_ajax_referer('tmw_stripe_admin', 'nonce');
+
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error('Unauthorized');
+    }
+
+    $api = new TMW_Stripe_API();
+    
+    if (!$api->get_secret_key()) {
+        wp_send_json_error('No API key configured for current mode');
+    }
+
+    $result = $api->test_connection();
+
+    if ($result['success']) {
+        wp_send_json_success($result);
+    } else {
+        wp_send_json_error($result['error']);
+    }
 }
 
 /**
