@@ -123,11 +123,6 @@ function tmw_tier_pricing_admin_scripts() {
         // Pricing data from PHP
         var pricingData = typeof tmwTierPricing !== 'undefined' ? tmwTierPricing : {};
         
-        
-        // Initial toggle
-        toggleStripeFields();
-        $('#membership_plugin').on('change', toggleStripeFields);
-        
         // When "Add New Tier" is clicked - clear pricing fields
         $('#tmw-add-tier').on('click', function() {
             setTimeout(function() {
