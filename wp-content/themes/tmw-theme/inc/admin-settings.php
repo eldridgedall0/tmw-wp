@@ -861,7 +861,6 @@ function tmw_render_admin_scripts() {
             var s=$('#tier-slug').val().toLowerCase().replace(/[^a-z0-9_-]/g,'');
             if(!s){alert('Slug required');return}
 			var tpm=$('#tier-stripe-price-monthly').val();
-			if(tpm){alert(tpm);return}
             $.post(ajaxurl,{action:'tmw_save_tier',nonce:nonce,slug:s,original_slug:$('#tier-original-slug').val(),
                 data:{
                     name:$('#tier-name').val(),
@@ -876,7 +875,7 @@ function tmw_render_admin_scripts() {
                     stripe_price_id_yearly:$('#tier-stripe-price-yearly').val(),
                     stripe_product_id:$('#tier-stripe-product-id').val()
                 }
-            },function(r){if(r.success)location.reload();else alert(r.data||'Error')});
+            },function(r){if(r.success)alert(tpm);return;else alert(r.data||'Error')});
         });
         $(document).on('click','.tmw-delete-tier',function(){
             if(!confirm('Delete this tier?'))return;
