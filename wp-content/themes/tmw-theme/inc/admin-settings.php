@@ -874,7 +874,7 @@ function tmw_render_admin_scripts() {
                     stripe_price_id_yearly:$('#tier-stripe-price-yearly').val(),
                     stripe_product_id:$('#tier-stripe-product-id').val()
                 }
-            },function(r){if(r.success)alert(stripe_price_id_monthly);else alert(r.data||'Error')});
+            },function(r){if(r.success)alert(swpm_level_id);else alert(r.data||'Error')});
         });
         $(document).on('click','.tmw-delete-tier',function(){
             if(!confirm('Delete this tier?'))return;
