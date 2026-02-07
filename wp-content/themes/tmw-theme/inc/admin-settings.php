@@ -653,38 +653,7 @@ function tmw_render_tiers_tab() {
                 <tr><th><label for="tier-is-free">Is Free Tier?</label></th><td><label><input type="checkbox" id="tier-is-free"> This is a free/no-cost tier</label></td></tr>
                 <tr><th><label for="tier-order">Display Order</label></th><td><input type="number" id="tier-order" class="small-text" min="1" value="1"></td></tr>
                 <tr><th><label for="tier-color">Badge Color</label></th><td><input type="color" id="tier-color" value="#6b7280"></td></tr>
-                
-                <!-- Pricing Fields -->
-                <tr><th colspan="2" style="padding-bottom:0;"><h4 style="margin:0;border-top:1px solid #ddd;padding-top:15px;"><?php _e('Pricing', 'flavor-starter-flavor'); ?></h4></th></tr>
-                <tr>
-                    <th><label for="tier-price-monthly"><?php _e('Monthly Price ($)', 'flavor-starter-flavor'); ?></label></th>
-                    <td><input type="number" id="tier-price-monthly" class="small-text" min="0" step="0.01" value="0"><p class="description"><?php _e('Display price for pricing page', 'flavor-starter-flavor'); ?></p></td>
-                </tr>
-                <tr>
-                    <th><label for="tier-price-yearly"><?php _e('Yearly Price ($)', 'flavor-starter-flavor'); ?></label></th>
-                    <td><input type="number" id="tier-price-yearly" class="small-text" min="0" step="0.01" value="0"><p class="description"><?php _e('Display price for yearly billing', 'flavor-starter-flavor'); ?></p></td>
-                </tr>
-                
-                <?php
-                // Stripe fields - only show if Stripe is selected as membership plugin
-                $membership_plugin = tmw_get_setting('membership_plugin', 'simple-membership');
-                $show_stripe = ($membership_plugin === 'stripe');
-                ?>
-                <tr class="tmw-stripe-field" style="<?php echo $show_stripe ? '' : 'display:none;'; ?>">
-                    <th colspan="2" style="padding-bottom:0;"><h4 style="margin:0;border-top:1px solid #ddd;padding-top:15px;"><?php _e('Stripe Configuration', 'flavor-starter-flavor'); ?></h4></th>
-                </tr>
-                <tr class="tmw-stripe-field" style="<?php echo $show_stripe ? '' : 'display:none;'; ?>">
-                    <th><label for="tier-stripe-price-monthly"><?php _e('Stripe Monthly Price ID', 'flavor-starter-flavor'); ?></label></th>
-                    <td><input type="text" id="tier-stripe-price-monthly" class="regular-text" placeholder="price_xxxxxxxxxxxxx"><p class="description"><?php _e('From Stripe Dashboard → Products → Price ID', 'flavor-starter-flavor'); ?></p></td>
-                </tr>
-                <tr class="tmw-stripe-field" style="<?php echo $show_stripe ? '' : 'display:none;'; ?>">
-                    <th><label for="tier-stripe-price-yearly"><?php _e('Stripe Yearly Price ID', 'flavor-starter-flavor'); ?></label></th>
-                    <td><input type="text" id="tier-stripe-price-yearly" class="regular-text" placeholder="price_yyyyyyyyyyyyy"><p class="description"><?php _e('Optional - for yearly billing', 'flavor-starter-flavor'); ?></p></td>
-                </tr>
-                <tr class="tmw-stripe-field" style="<?php echo $show_stripe ? '' : 'display:none;'; ?>">
-                    <th><label for="tier-stripe-product-id"><?php _e('Stripe Product ID', 'flavor-starter-flavor'); ?></label></th>
-                    <td><input type="text" id="tier-stripe-product-id" class="regular-text" placeholder="prod_zzzzzzzzzzzzz"><p class="description"><?php _e('Optional - for reference', 'flavor-starter-flavor'); ?></p></td>
-                </tr>
+				<?php do_action('tmw_tier_modal_fields'); ?>
             </table>
             <input type="hidden" id="tier-original-slug" value="">
             <p class="tmw-modal-buttons">
