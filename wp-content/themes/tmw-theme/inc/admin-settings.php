@@ -44,6 +44,13 @@ function tmw_register_settings() {
         'sanitize_callback' => 'tmw_sanitize_tier_values',
         'default'           => tmw_get_default_tier_values(),
     ));
+    
+    // GarageMinder App Configuration
+    register_setting('tmw_gm_config_group', 'tmw_gm_config', array(
+        'type'              => 'array',
+        'sanitize_callback' => 'tmw_sanitize_gm_config',
+        'default'           => tmw_get_default_gm_config(),
+    ));
 }
 
 // =============================================================================
@@ -56,6 +63,49 @@ function tmw_get_default_settings() {
         'login_redirect'    => 'app',
         'logout_redirect'   => 'home',
         'membership_plugin' => 'simple-membership',
+    );
+}
+
+function tmw_get_default_gm_config() {
+    return array(
+        // App Branding
+        'app_name'                      => 'TrackMyWrench',
+        'app_short_name'                => 'TrackMyWrench',
+        'app_domain'                    => 'trackmywrench.com',
+        'app_tagline'                   => '',
+        'app_copyright_year'            => date('Y'),
+        'app_version'                   => '2.4.1.1',
+        
+        // App Settings
+        'dashboard_history_per_page'    => 10,
+        'entry_max_attachments'         => 2,
+        'entry_max_attachment_size_mb'  => 5,
+        
+        // File Storage
+        'allowed_extensions'            => 'pdf,doc,docx,jpg,jpeg,png,gif,webp',
+        'attachments_url_base'          => '/garage/download.php?id=',
+        
+        // Security
+        'require_https'                 => false,
+        'api_rate_limit_per_minute'     => 60,
+        'session_timeout_minutes'       => 120,
+        
+        // WordPress Integration
+        'enable_multi_user'             => true,
+        'require_subscription'          => false,
+        'custom_login_url'              => '/gm/',
+        'custom_logout_url'             => '/gm/',
+        'custom_register_url'           => '/register/',
+        'custom_profile_url'            => '/my-profile/',
+        'custom_subscribe_url'          => '',
+        'logout_redirect_url'           => '/gm/',
+        
+        // Google Drive
+        'google_drive_enabled'          => false,
+        'google_client_id'              => '',
+        'google_client_secret'          => '',
+        'google_redirect_uri'           => '',
+        'google_drive_folder_name'      => 'TrackMyWrench Attachments',
     );
 }
 
@@ -240,6 +290,19 @@ function tmw_get_level_mapping($key = null, $default = null) {
     return $mapping;
 }
 
+// Get GarageMinder App Configuration
+function tmw_get_gm_config($key = null, $default = null) {
+    $config = get_option('tmw_gm_config', array());
+    if (empty($config)) {
+        $config = tmw_get_default_gm_config();
+    }
+    
+    if ($key !== null) {
+        return isset($config[$key]) ? $config[$key] : $default;
+    }
+    return $config;
+}
+
 // =============================================================================
 // SANITIZATION
 // =============================================================================
@@ -251,6 +314,51 @@ function tmw_sanitize_settings($input) {
     $sanitized['login_redirect'] = isset($input['login_redirect']) ? sanitize_key($input['login_redirect']) : 'app';
     $sanitized['logout_redirect'] = isset($input['logout_redirect']) ? sanitize_key($input['logout_redirect']) : 'home';
     $sanitized['membership_plugin'] = isset($input['membership_plugin']) ? sanitize_key($input['membership_plugin']) : 'simple-membership';
+    return $sanitized;
+}
+
+function tmw_sanitize_gm_config($input) {
+    $sanitized = array();
+    
+    // App Branding
+    $sanitized['app_name'] = isset($input['app_name']) ? sanitize_text_field($input['app_name']) : 'TrackMyWrench';
+    $sanitized['app_short_name'] = isset($input['app_short_name']) ? sanitize_text_field($input['app_short_name']) : 'TrackMyWrench';
+    $sanitized['app_domain'] = isset($input['app_domain']) ? sanitize_text_field($input['app_domain']) : 'trackmywrench.com';
+    $sanitized['app_tagline'] = isset($input['app_tagline']) ? sanitize_text_field($input['app_tagline']) : '';
+    $sanitized['app_copyright_year'] = isset($input['app_copyright_year']) ? sanitize_text_field($input['app_copyright_year']) : date('Y');
+    $sanitized['app_version'] = isset($input['app_version']) ? sanitize_text_field($input['app_version']) : '2.4.1.1';
+    
+    // App Settings
+    $sanitized['dashboard_history_per_page'] = isset($input['dashboard_history_per_page']) ? absint($input['dashboard_history_per_page']) : 10;
+    $sanitized['entry_max_attachments'] = isset($input['entry_max_attachments']) ? absint($input['entry_max_attachments']) : 2;
+    $sanitized['entry_max_attachment_size_mb'] = isset($input['entry_max_attachment_size_mb']) ? absint($input['entry_max_attachment_size_mb']) : 5;
+    
+    // File Storage
+    $sanitized['allowed_extensions'] = isset($input['allowed_extensions']) ? sanitize_text_field($input['allowed_extensions']) : 'pdf,doc,docx,jpg,jpeg,png,gif,webp';
+    $sanitized['attachments_url_base'] = isset($input['attachments_url_base']) ? sanitize_text_field($input['attachments_url_base']) : '/garage/download.php?id=';
+    
+    // Security
+    $sanitized['require_https'] = !empty($input['require_https']);
+    $sanitized['api_rate_limit_per_minute'] = isset($input['api_rate_limit_per_minute']) ? absint($input['api_rate_limit_per_minute']) : 60;
+    $sanitized['session_timeout_minutes'] = isset($input['session_timeout_minutes']) ? absint($input['session_timeout_minutes']) : 120;
+    
+    // WordPress Integration
+    $sanitized['enable_multi_user'] = !empty($input['enable_multi_user']);
+    $sanitized['require_subscription'] = !empty($input['require_subscription']);
+    $sanitized['custom_login_url'] = isset($input['custom_login_url']) ? sanitize_text_field($input['custom_login_url']) : '/gm/';
+    $sanitized['custom_logout_url'] = isset($input['custom_logout_url']) ? sanitize_text_field($input['custom_logout_url']) : '/gm/';
+    $sanitized['custom_register_url'] = isset($input['custom_register_url']) ? sanitize_text_field($input['custom_register_url']) : '/register/';
+    $sanitized['custom_profile_url'] = isset($input['custom_profile_url']) ? sanitize_text_field($input['custom_profile_url']) : '/my-profile/';
+    $sanitized['custom_subscribe_url'] = isset($input['custom_subscribe_url']) ? sanitize_text_field($input['custom_subscribe_url']) : '';
+    $sanitized['logout_redirect_url'] = isset($input['logout_redirect_url']) ? sanitize_text_field($input['logout_redirect_url']) : '/gm/';
+    
+    // Google Drive
+    $sanitized['google_drive_enabled'] = !empty($input['google_drive_enabled']);
+    $sanitized['google_client_id'] = isset($input['google_client_id']) ? sanitize_text_field($input['google_client_id']) : '';
+    $sanitized['google_client_secret'] = isset($input['google_client_secret']) ? sanitize_text_field($input['google_client_secret']) : '';
+    $sanitized['google_redirect_uri'] = isset($input['google_redirect_uri']) ? esc_url_raw($input['google_redirect_uri']) : '';
+    $sanitized['google_drive_folder_name'] = isset($input['google_drive_folder_name']) ? sanitize_text_field($input['google_drive_folder_name']) : 'TrackMyWrench Attachments';
+    
     return $sanitized;
 }
 
@@ -540,7 +648,10 @@ function tmw_render_settings_page() {
 // =============================================================================
 function tmw_render_general_tab() {
     $settings = wp_parse_args(get_option('tmw_settings', array()), tmw_get_default_settings());
+    $gm_config = wp_parse_args(get_option('tmw_gm_config', array()), tmw_get_default_gm_config());
     ?>
+    
+    <h2>WordPress Settings</h2>
     <form method="post" action="options.php">
         <?php settings_fields('tmw_settings_group'); ?>
         <table class="form-table">
@@ -586,6 +697,263 @@ function tmw_render_general_tab() {
         </table>
         <?php submit_button(); ?>
     </form>
+    
+    <hr style="margin: 40px 0;">
+    
+    <h2>GarageMinder App Configuration</h2>
+    <p class="description" style="margin-bottom: 20px;">Configure the GarageMinder app settings. These settings override the values in config.php.</p>
+    
+    <form method="post" action="options.php">
+        <?php settings_fields('tmw_gm_config_group'); ?>
+        
+        <!-- App Branding Section -->
+        <h3 class="tmw-section-title" style="cursor: pointer; padding: 10px; background: #f5f5f5; margin: 20px 0 0 0;" onclick="jQuery('#gm-branding-section').slideToggle()">
+            <span class="dashicons dashicons-arrow-down-alt2" style="margin-top: 2px;"></span> App Branding
+        </h3>
+        <table class="form-table" id="gm-branding-section">
+            <tr>
+                <th><label for="app_name">App Name</label></th>
+                <td>
+                    <input type="text" id="app_name" name="tmw_gm_config[app_name]" value="<?php echo esc_attr($gm_config['app_name']); ?>" class="regular-text">
+                    <p class="description">Full app name (used in exports, disclaimers, copyright)</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="app_short_name">App Short Name</label></th>
+                <td>
+                    <input type="text" id="app_short_name" name="tmw_gm_config[app_short_name]" value="<?php echo esc_attr($gm_config['app_short_name']); ?>" class="regular-text">
+                    <p class="description">Short name for PWA/mobile app title</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="app_domain">App Domain</label></th>
+                <td>
+                    <input type="text" id="app_domain" name="tmw_gm_config[app_domain]" value="<?php echo esc_attr($gm_config['app_domain']); ?>" class="regular-text">
+                    <p class="description">Domain for branding/alt text</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="app_tagline">App Tagline</label></th>
+                <td>
+                    <input type="text" id="app_tagline" name="tmw_gm_config[app_tagline]" value="<?php echo esc_attr($gm_config['app_tagline']); ?>" class="regular-text">
+                    <p class="description">Optional tagline</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="app_copyright_year">Copyright Year</label></th>
+                <td>
+                    <input type="text" id="app_copyright_year" name="tmw_gm_config[app_copyright_year]" value="<?php echo esc_attr($gm_config['app_copyright_year']); ?>" class="small-text">
+                    <p class="description">Copyright year in footer</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="app_version">App Version</label></th>
+                <td>
+                    <input type="text" id="app_version" name="tmw_gm_config[app_version]" value="<?php echo esc_attr($gm_config['app_version']); ?>" class="small-text">
+                    <p class="description">Version displayed in footer</p>
+                </td>
+            </tr>
+        </table>
+        
+        <!-- App Settings Section -->
+        <h3 class="tmw-section-title" style="cursor: pointer; padding: 10px; background: #f5f5f5; margin: 20px 0 0 0;" onclick="jQuery('#gm-settings-section').slideToggle()">
+            <span class="dashicons dashicons-arrow-down-alt2" style="margin-top: 2px;"></span> App Settings
+        </h3>
+        <table class="form-table" id="gm-settings-section" style="display: none;">
+            <tr>
+                <th><label for="dashboard_history_per_page">Dashboard History Per Page</label></th>
+                <td>
+                    <input type="number" id="dashboard_history_per_page" name="tmw_gm_config[dashboard_history_per_page]" value="<?php echo esc_attr($gm_config['dashboard_history_per_page']); ?>" class="small-text" min="1">
+                    <p class="description">Entries per page in Vehicle Overview</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="entry_max_attachments">Max Attachments Per Entry</label></th>
+                <td>
+                    <input type="number" id="entry_max_attachments" name="tmw_gm_config[entry_max_attachments]" value="<?php echo esc_attr($gm_config['entry_max_attachments']); ?>" class="small-text" min="0">
+                    <p class="description">Maximum attachments per service entry</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="entry_max_attachment_size_mb">Max Attachment Size (MB)</label></th>
+                <td>
+                    <input type="number" id="entry_max_attachment_size_mb" name="tmw_gm_config[entry_max_attachment_size_mb]" value="<?php echo esc_attr($gm_config['entry_max_attachment_size_mb']); ?>" class="small-text" min="1">
+                    <p class="description">Maximum size per attachment file in MB</p>
+                </td>
+            </tr>
+        </table>
+        
+        <!-- File Storage Section -->
+        <h3 class="tmw-section-title" style="cursor: pointer; padding: 10px; background: #f5f5f5; margin: 20px 0 0 0;" onclick="jQuery('#gm-storage-section').slideToggle()">
+            <span class="dashicons dashicons-arrow-down-alt2" style="margin-top: 2px;"></span> File Storage
+        </h3>
+        <table class="form-table" id="gm-storage-section" style="display: none;">
+            <tr>
+                <th><label for="allowed_extensions">Allowed File Extensions</label></th>
+                <td>
+                    <input type="text" id="allowed_extensions" name="tmw_gm_config[allowed_extensions]" value="<?php echo esc_attr($gm_config['allowed_extensions']); ?>" class="large-text">
+                    <p class="description">Comma-separated list (e.g., pdf,doc,docx,jpg,jpeg,png,gif,webp)</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="attachments_url_base">Attachments URL Base</label></th>
+                <td>
+                    <input type="text" id="attachments_url_base" name="tmw_gm_config[attachments_url_base]" value="<?php echo esc_attr($gm_config['attachments_url_base']); ?>" class="regular-text">
+                    <p class="description">Base URL for attachment downloads</p>
+                </td>
+            </tr>
+        </table>
+        
+        <!-- Security Section -->
+        <h3 class="tmw-section-title" style="cursor: pointer; padding: 10px; background: #f5f5f5; margin: 20px 0 0 0;" onclick="jQuery('#gm-security-section').slideToggle()">
+            <span class="dashicons dashicons-arrow-down-alt2" style="margin-top: 2px;"></span> Security
+        </h3>
+        <table class="form-table" id="gm-security-section" style="display: none;">
+            <tr>
+                <th><label for="require_https">Require HTTPS</label></th>
+                <td>
+                    <label>
+                        <input type="checkbox" id="require_https" name="tmw_gm_config[require_https]" value="1" <?php checked($gm_config['require_https']); ?>>
+                        Force HTTPS in production
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="api_rate_limit_per_minute">API Rate Limit</label></th>
+                <td>
+                    <input type="number" id="api_rate_limit_per_minute" name="tmw_gm_config[api_rate_limit_per_minute]" value="<?php echo esc_attr($gm_config['api_rate_limit_per_minute']); ?>" class="small-text" min="1">
+                    <p class="description">Max API calls per user per minute</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="session_timeout_minutes">Session Timeout (Minutes)</label></th>
+                <td>
+                    <input type="number" id="session_timeout_minutes" name="tmw_gm_config[session_timeout_minutes]" value="<?php echo esc_attr($gm_config['session_timeout_minutes']); ?>" class="small-text" min="1">
+                    <p class="description">Session timeout in minutes</p>
+                </td>
+            </tr>
+        </table>
+        
+        <!-- WordPress Integration Section -->
+        <h3 class="tmw-section-title" style="cursor: pointer; padding: 10px; background: #f5f5f5; margin: 20px 0 0 0;" onclick="jQuery('#gm-wp-section').slideToggle()">
+            <span class="dashicons dashicons-arrow-down-alt2" style="margin-top: 2px;"></span> WordPress Integration
+        </h3>
+        <table class="form-table" id="gm-wp-section" style="display: none;">
+            <tr>
+                <th><label for="enable_multi_user">Enable Multi-User</label></th>
+                <td>
+                    <label>
+                        <input type="checkbox" id="enable_multi_user" name="tmw_gm_config[enable_multi_user]" value="1" <?php checked($gm_config['enable_multi_user']); ?>>
+                        Enable WordPress authentication
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="require_subscription">Require Subscription</label></th>
+                <td>
+                    <label>
+                        <input type="checkbox" id="require_subscription" name="tmw_gm_config[require_subscription]" value="1" <?php checked($gm_config['require_subscription']); ?>>
+                        Require active subscription to access app
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="custom_login_url">Custom Login URL</label></th>
+                <td>
+                    <input type="text" id="custom_login_url" name="tmw_gm_config[custom_login_url]" value="<?php echo esc_attr($gm_config['custom_login_url']); ?>" class="regular-text">
+                    <p class="description">e.g., /login/ or /my-account/</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="custom_logout_url">Custom Logout URL</label></th>
+                <td>
+                    <input type="text" id="custom_logout_url" name="tmw_gm_config[custom_logout_url]" value="<?php echo esc_attr($gm_config['custom_logout_url']); ?>" class="regular-text">
+                    <p class="description">Leave empty to use wp_logout_url()</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="custom_register_url">Custom Register URL</label></th>
+                <td>
+                    <input type="text" id="custom_register_url" name="tmw_gm_config[custom_register_url]" value="<?php echo esc_attr($gm_config['custom_register_url']); ?>" class="regular-text">
+                    <p class="description">e.g., /register/ or /signup/</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="custom_profile_url">Custom Profile URL</label></th>
+                <td>
+                    <input type="text" id="custom_profile_url" name="tmw_gm_config[custom_profile_url]" value="<?php echo esc_attr($gm_config['custom_profile_url']); ?>" class="regular-text">
+                    <p class="description">e.g., /my-account/ or /profile/</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="custom_subscribe_url">Custom Subscribe URL</label></th>
+                <td>
+                    <input type="text" id="custom_subscribe_url" name="tmw_gm_config[custom_subscribe_url]" value="<?php echo esc_attr($gm_config['custom_subscribe_url']); ?>" class="regular-text">
+                    <p class="description">e.g., /pricing/ or /subscribe/</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="logout_redirect_url">Logout Redirect URL</label></th>
+                <td>
+                    <input type="text" id="logout_redirect_url" name="tmw_gm_config[logout_redirect_url]" value="<?php echo esc_attr($gm_config['logout_redirect_url']); ?>" class="regular-text">
+                    <p class="description">Where to redirect after logout</p>
+                </td>
+            </tr>
+        </table>
+        
+        <!-- Google Drive Section -->
+        <h3 class="tmw-section-title" style="cursor: pointer; padding: 10px; background: #f5f5f5; margin: 20px 0 0 0;" onclick="jQuery('#gm-gdrive-section').slideToggle()">
+            <span class="dashicons dashicons-arrow-down-alt2" style="margin-top: 2px;"></span> Google Drive Integration
+        </h3>
+        <table class="form-table" id="gm-gdrive-section" style="display: none;">
+            <tr>
+                <th><label for="google_drive_enabled">Enable Google Drive</label></th>
+                <td>
+                    <label>
+                        <input type="checkbox" id="google_drive_enabled" name="tmw_gm_config[google_drive_enabled]" value="1" <?php checked($gm_config['google_drive_enabled']); ?>>
+                        Enable Google Drive for file attachments
+                    </label>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="google_client_id">Google Client ID</label></th>
+                <td>
+                    <input type="text" id="google_client_id" name="tmw_gm_config[google_client_id]" value="<?php echo esc_attr($gm_config['google_client_id']); ?>" class="large-text">
+                </td>
+            </tr>
+            <tr>
+                <th><label for="google_client_secret">Google Client Secret</label></th>
+                <td>
+                    <input type="text" id="google_client_secret" name="tmw_gm_config[google_client_secret]" value="<?php echo esc_attr($gm_config['google_client_secret']); ?>" class="large-text">
+                </td>
+            </tr>
+            <tr>
+                <th><label for="google_redirect_uri">Google Redirect URI</label></th>
+                <td>
+                    <input type="url" id="google_redirect_uri" name="tmw_gm_config[google_redirect_uri]" value="<?php echo esc_attr($gm_config['google_redirect_uri']); ?>" class="large-text">
+                    <p class="description">OAuth callback URL</p>
+                </td>
+            </tr>
+            <tr>
+                <th><label for="google_drive_folder_name">Google Drive Folder Name</label></th>
+                <td>
+                    <input type="text" id="google_drive_folder_name" name="tmw_gm_config[google_drive_folder_name]" value="<?php echo esc_attr($gm_config['google_drive_folder_name']); ?>" class="regular-text">
+                    <p class="description">Name of folder to store attachments</p>
+                </td>
+            </tr>
+        </table>
+        
+        <?php submit_button('Save GarageMinder Configuration'); ?>
+    </form>
+    
+    <script>
+    jQuery(document).ready(function($) {
+        // Toggle section visibility
+        $('.tmw-section-title').on('click', function() {
+            $(this).find('.dashicons').toggleClass('dashicons-arrow-down-alt2 dashicons-arrow-up-alt2');
+        });
+    });
+    </script>
     <?php
 }
 
