@@ -210,6 +210,18 @@
         // Add action and nonce
         formData.append('action', action);
         formData.append('nonce', typeof tmwData !== 'undefined' ? tmwData.nonce : '');
+
+        // --- MOBILE APP SUPPORT ---
+        // If this page was loaded with ?mobile=1, forward the flag so the
+        // AJAX handler can return the correct login_success redirect URL.
+        // The hidden input injected by mobile-login.php already handles this,
+        // but we add it here too as belt-and-suspenders.
+        if (typeof tmwData !== 'undefined' && tmwData.isMobile) {
+            if (!formData.has('mobile')) {
+                formData.append('mobile', '1');
+            }
+        }
+        // --------------------------
         
         fetch(typeof tmwData !== 'undefined' ? tmwData.ajaxUrl : '/wp-admin/admin-ajax.php', {
             method: 'POST',
@@ -225,9 +237,12 @@
                 
                 // Redirect if provided
                 if (result.data.redirect) {
+                    // For mobile app: redirect immediately — the WebView intercepts it.
+                    // For web: 1-second delay so the success message is readable.
+                    var delay = (result.data.mobile) ? 0 : 1000;
                     setTimeout(function() {
                         window.location.href = result.data.redirect;
-                    }, 1000);
+                    }, delay);
                 }
             } else {
                 showFormMessage(form, result.data.message, 'error');

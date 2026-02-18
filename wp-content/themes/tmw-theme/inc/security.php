@@ -259,7 +259,17 @@ function tmw_security_headers() {
         return;
     }
 
-    header('X-Frame-Options: SAMEORIGIN');
+    // X-Frame-Options: Allow same-origin for most pages.
+    // Exception: the login page with ?mobile=1 — it loads inside an Android WebView
+    // which is NOT same-origin. We omit X-Frame-Options so WebView can render it.
+    $is_mobile_login = is_page_template('templates/template-login.php')
+                    && isset($_GET['mobile'])
+                    && $_GET['mobile'] === '1';
+
+    if (!$is_mobile_login) {
+        header('X-Frame-Options: SAMEORIGIN');
+    }
+
     header('X-Content-Type-Options: nosniff');
     header('X-XSS-Protection: 1; mode=block');
     header('Referrer-Policy: strict-origin-when-cross-origin');
@@ -291,7 +301,7 @@ function tmw_protect_member_pages() {
 // =============================================================================
 // REDIRECT LOGGED-IN USERS AWAY FROM AUTH PAGES
 // =============================================================================
-add_action('template_redirect', 'tmw_redirect_logged_in_users');
+add_action('template_redirect', 'tmw_redirect_logged_in_users', 10);
 
 function tmw_redirect_logged_in_users() {
     if (!is_user_logged_in()) {
@@ -300,6 +310,13 @@ function tmw_redirect_logged_in_users() {
 
     // If logged in and on login page, redirect to app
     if (is_page_template('templates/template-login.php')) {
+        // Exception: mobile app WebView re-visiting /login?mobile=1 while already logged in.
+        // In this case tmw_mobile_logged_in_bypass() (priority 5) already fired and
+        // redirected to the success URL — so we never reach here for mobile.
+        // For regular web users, proceed normally.
+        if (isset($_GET['mobile']) && $_GET['mobile'] === '1') {
+            return; // mobile-login.php handles this at priority 5
+        }
         wp_safe_redirect(tmw_get_app_url());
         exit;
     }
