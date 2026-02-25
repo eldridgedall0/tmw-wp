@@ -16,18 +16,18 @@ if (function_exists('tmw_get_tiers_with_pricing')) {
     $tiers = tmw_get_tiers();
 }
 $free_tier = $tiers['free'] ?? array();
-$paid_tier = $tiers['paid'] ?? array();
-$fleet_tier = $tiers['fleet'] ?? array();
+$pro_tier = $tiers['pro'] ?? array();
+$master_tier = $tiers['master'] ?? array();
 
 // Get prices from tier settings (with fallbacks)
-$paid_price_monthly = $paid_tier['price_monthly'] ?? 9;
-$paid_price_yearly = $paid_tier['price_yearly'] ?? 86;
-$fleet_price_monthly = $fleet_tier['price_monthly'] ?? 29;
-$fleet_price_yearly = $fleet_tier['price_yearly'] ?? 278;
+$pro_price_monthly = $pro_tier['price_monthly'] ?? 9;
+$pro_price_yearly = $pro_tier['price_yearly'] ?? 86;
+$master_price_monthly = $master_tier['price_monthly'] ?? 29;
+$master_price_yearly = $master_tier['price_yearly'] ?? 278;
 
 // Get level IDs from settings for SWPM join URLs
-$paid_level_id = tmw_get_level_mapping('paid_level_id', 2);
-$fleet_level_id = tmw_get_level_mapping('fleet_level_id', 3);
+$pro_level_id = tmw_get_level_mapping('pro_level_id', 2);
+$master_level_id = tmw_get_level_mapping('master_level_id', 3);
 
 get_header();
 ?>
@@ -56,8 +56,8 @@ get_header();
             
             <?php
             $free_limits = tmw_get_tier_limits('free');
-            $paid_limits = tmw_get_tier_limits('paid');
-            $fleet_limits = tmw_get_tier_limits('fleet');
+            $pro_limits = tmw_get_tier_limits('pro');
+            $master_limits = tmw_get_tier_limits('master');
             ?>
 
             <!-- Free Tier -->
@@ -91,52 +91,52 @@ get_header();
                 </div>
             </div>
 
-            <!-- Paid Tier -->
-            <div class="tmw-pricing-card tmw-pricing-popular <?php echo $current_tier === 'paid' ? 'tmw-pricing-current' : ''; ?>">
+            <!-- pro Tier -->
+            <div class="tmw-pricing-card tmw-pricing-popular <?php echo $current_tier === 'pro' ? 'tmw-pricing-current' : ''; ?>">
                 <div class="tmw-pricing-badge"><?php _e('Most Popular', 'flavor-starter-flavor'); ?></div>
                 <div class="tmw-pricing-header">
-                    <h3 class="tmw-pricing-name"><?php echo esc_html($paid_tier['name'] ?? __('Paid', 'flavor-starter-flavor')); ?></h3>
+                    <h3 class="tmw-pricing-name"><?php echo esc_html($pro_tier['name'] ?? __('pro', 'flavor-starter-flavor')); ?></h3>
                     <div class="tmw-pricing-price">
                         <span class="tmw-pricing-currency">$</span>
-                        <span class="tmw-pricing-amount" data-price-monthly="<?php echo esc_attr($paid_price_monthly); ?>" data-price-yearly="<?php echo esc_attr($paid_price_yearly); ?>"><?php echo esc_html($paid_price_monthly); ?></span>
+                        <span class="tmw-pricing-amount" data-price-monthly="<?php echo esc_attr($pro_price_monthly); ?>" data-price-yearly="<?php echo esc_attr($pro_price_yearly); ?>"><?php echo esc_html($pro_price_monthly); ?></span>
                         <span class="tmw-pricing-period">/month</span>
                     </div>
                 </div>
                 <ul class="tmw-pricing-features">
-                    <li><i class="fas fa-check"></i> <?php printf(__('%d Vehicles', 'flavor-starter-flavor'), $paid_limits['max_vehicles']); ?></li>
+                    <li><i class="fas fa-check"></i> <?php printf(__('%d Vehicles', 'flavor-starter-flavor'), $pro_limits['max_vehicles']); ?></li>
                     <li><i class="fas fa-check"></i> <?php _e('Unlimited Entries', 'flavor-starter-flavor'); ?></li>
-                    <li><i class="fas fa-check"></i> <?php printf(__('%d Templates', 'flavor-starter-flavor'), $paid_limits['max_templates']); ?></li>
-                    <li><i class="fas fa-check"></i> <?php printf(__('%d Attachments/Entry', 'flavor-starter-flavor'), $paid_limits['attachments_per_entry']); ?></li>
+                    <li><i class="fas fa-check"></i> <?php printf(__('%d Templates', 'flavor-starter-flavor'), $pro_limits['max_templates']); ?></li>
+                    <li><i class="fas fa-check"></i> <?php printf(__('%d Attachments/Entry', 'flavor-starter-flavor'), $pro_limits['attachments_per_entry']); ?></li>
                     <li><i class="fas fa-check"></i> <?php _e('Recall Alerts', 'flavor-starter-flavor'); ?></li>
                     <li><i class="fas fa-check"></i> <?php _e('CSV & PDF Export', 'flavor-starter-flavor'); ?></li>
                 </ul>
                 <div class="tmw-pricing-footer">
-                    <?php if ($current_tier === 'paid') : ?>
+                    <?php if ($current_tier === 'pro') : ?>
                         <span class="tmw-btn tmw-btn-primary tmw-btn-full" disabled><?php _e('Current Plan', 'flavor-starter-flavor'); ?></span>
-                    <?php elseif ($current_tier === 'fleet') : ?>
+                    <?php elseif ($current_tier === 'master') : ?>
                         <span class="tmw-btn tmw-btn-secondary tmw-btn-full" disabled><?php _e('Downgrade', 'flavor-starter-flavor'); ?></span>
                     <?php elseif (tmw_is_stripe_active()) : ?>
                         <button type="button" 
                                 class="tmw-btn tmw-btn-primary tmw-btn-full tmw-subscribe-btn" 
-                                data-tier="paid"
+                                data-tier="pro"
                                 data-period="monthly">
                             <?php _e('Subscribe Now', 'flavor-starter-flavor'); ?>
                         </button>
                     <?php else : ?>
-                        <a href="<?php echo esc_url(tmw_get_swpm_join_url($paid_level_id)); ?>" class="tmw-btn tmw-btn-primary tmw-btn-full">
+                        <a href="<?php echo esc_url(tmw_get_swpm_join_url($pro_level_id)); ?>" class="tmw-btn tmw-btn-primary tmw-btn-full">
                             <?php _e('Subscribe Now', 'flavor-starter-flavor'); ?>
                         </a>
                     <?php endif; ?>
                 </div>
             </div>
 
-            <!-- Fleet Tier -->
-            <div class="tmw-pricing-card <?php echo $current_tier === 'fleet' ? 'tmw-pricing-current' : ''; ?>">
+            <!-- Master Tier -->
+            <div class="tmw-pricing-card <?php echo $current_tier === 'master' ? 'tmw-pricing-current' : ''; ?>">
                 <div class="tmw-pricing-header">
-                    <h3 class="tmw-pricing-name"><?php echo esc_html($fleet_tier['name'] ?? __('Fleet', 'flavor-starter-flavor')); ?></h3>
+                    <h3 class="tmw-pricing-name"><?php echo esc_html($master_tier['name'] ?? __('Master', 'flavor-starter-flavor')); ?></h3>
                     <div class="tmw-pricing-price">
                         <span class="tmw-pricing-currency">$</span>
-                        <span class="tmw-pricing-amount" data-price-monthly="<?php echo esc_attr($fleet_price_monthly); ?>" data-price-yearly="<?php echo esc_attr($fleet_price_yearly); ?>"><?php echo esc_html($fleet_price_monthly); ?></span>
+                        <span class="tmw-pricing-amount" data-price-monthly="<?php echo esc_attr($master_price_monthly); ?>" data-price-yearly="<?php echo esc_attr($master_price_yearly); ?>"><?php echo esc_html($master_price_monthly); ?></span>
                         <span class="tmw-pricing-period">/month</span>
                     </div>
                 </div>
@@ -144,7 +144,7 @@ get_header();
                     <li><i class="fas fa-check"></i> <?php _e('Unlimited Vehicles', 'flavor-starter-flavor'); ?></li>
                     <li><i class="fas fa-check"></i> <?php _e('Unlimited Entries', 'flavor-starter-flavor'); ?></li>
                     <li><i class="fas fa-check"></i> <?php _e('Unlimited Templates', 'flavor-starter-flavor'); ?></li>
-                    <li><i class="fas fa-check"></i> <?php printf(__('%d Attachments/Entry', 'flavor-starter-flavor'), $fleet_limits['attachments_per_entry']); ?></li>
+                    <li><i class="fas fa-check"></i> <?php printf(__('%d Attachments/Entry', 'flavor-starter-flavor'), $master_limits['attachments_per_entry']); ?></li>
                     <li><i class="fas fa-check"></i> <?php _e('Bulk Export + API', 'flavor-starter-flavor'); ?></li>
                     <li>
                         <i class="fas fa-check"></i> <?php _e('Team Members', 'flavor-starter-flavor'); ?>
@@ -152,18 +152,18 @@ get_header();
                     </li>
                 </ul>
                 <div class="tmw-pricing-footer">
-                    <?php if ($current_tier === 'fleet') : ?>
+                    <?php if ($current_tier === 'master') : ?>
                         <span class="tmw-btn tmw-btn-secondary tmw-btn-full" disabled><?php _e('Current Plan', 'flavor-starter-flavor'); ?></span>
                     <?php elseif (tmw_is_stripe_active()) : ?>
                         <button type="button" 
                                 class="tmw-btn tmw-btn-secondary tmw-btn-full tmw-subscribe-btn" 
-                                data-tier="fleet"
+                                data-tier="master"
                                 data-period="monthly">
-                            <?php _e('Go Fleet', 'flavor-starter-flavor'); ?>
+                            <?php _e('Go Master', 'flavor-starter-flavor'); ?>
                         </button>
                     <?php else : ?>
-                        <a href="<?php echo esc_url(tmw_get_swpm_join_url($fleet_level_id)); ?>" class="tmw-btn tmw-btn-secondary tmw-btn-full">
-                            <?php _e('Go Fleet', 'flavor-starter-flavor'); ?>
+                        <a href="<?php echo esc_url(tmw_get_swpm_join_url($master_level_id)); ?>" class="tmw-btn tmw-btn-secondary tmw-btn-full">
+                            <?php _e('Go Master', 'flavor-starter-flavor'); ?>
                         </a>
                     <?php endif; ?>
                 </div>
@@ -178,8 +178,8 @@ get_header();
                     <tr>
                         <th><?php _e('Feature', 'flavor-starter-flavor'); ?></th>
                         <th><?php _e('Free', 'flavor-starter-flavor'); ?></th>
-                        <th class="tmw-pricing-table-popular"><?php _e('Paid', 'flavor-starter-flavor'); ?></th>
-                        <th><?php _e('Fleet', 'flavor-starter-flavor'); ?></th>
+                        <th class="tmw-pricing-table-popular"><?php _e('pro', 'flavor-starter-flavor'); ?></th>
+                        <th><?php _e('Master', 'flavor-starter-flavor'); ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -194,17 +194,17 @@ get_header();
                             <?php endif; ?>
                         </td>
                         <td>
-                            <?php if (is_bool($feature['paid'])) : ?>
-                                <i class="fas fa-<?php echo $feature['paid'] ? 'check text-success' : 'times text-muted'; ?>"></i>
+                            <?php if (is_bool($feature['pro'])) : ?>
+                                <i class="fas fa-<?php echo $feature['pro'] ? 'check text-success' : 'times text-muted'; ?>"></i>
                             <?php else : ?>
-                                <?php echo wp_kses_post($feature['paid']); ?>
+                                <?php echo wp_kses_post($feature['pro']); ?>
                             <?php endif; ?>
                         </td>
                         <td>
-                            <?php if (is_bool($feature['fleet'])) : ?>
-                                <i class="fas fa-<?php echo $feature['fleet'] ? 'check text-success' : 'times text-muted'; ?>"></i>
+                            <?php if (is_bool($feature['master'])) : ?>
+                                <i class="fas fa-<?php echo $feature['master'] ? 'check text-success' : 'times text-muted'; ?>"></i>
                             <?php else : ?>
-                                <?php echo wp_kses_post($feature['fleet']); ?>
+                                <?php echo wp_kses_post($feature['master']); ?>
                             <?php endif; ?>
                         </td>
                     </tr>
