@@ -166,6 +166,47 @@
 }
 
 /* ==========================================================================
+   PRICING — MOBILE FIXES
+   ========================================================================== */
+@media (max-width: 1023px) {
+    /* Single-column pricing grid, full width with breathing room */
+    .tmw-pricing-grid {
+        grid-template-columns: 1fr;
+        max-width: 100%;
+        padding-left: var(--tmw-space-4);
+        padding-right: var(--tmw-space-4);
+    }
+
+    /* Kill the scale transform that causes overflow on the popular card */
+    .tmw-pricing-popular {
+        transform: none;
+        box-shadow: 0 0 24px rgba(56, 189, 248, 0.15);
+    }
+
+    .tmw-pricing-popular:hover {
+        transform: translateY(-4px);
+    }
+}
+
+@media (max-width: 479px) {
+    /* Extra tight phones — reduce card internal padding */
+    .tmw-pricing-card {
+        padding: var(--tmw-space-5);
+    }
+
+    /* Shrink the big price number slightly so it never clips */
+    .tmw-pricing-amount {
+        font-size: var(--tmw-text-4xl);
+    }
+
+    /* Reduce container padding so cards get more horizontal room */
+    .tmw-container {
+        padding-left: var(--tmw-space-3);
+        padding-right: var(--tmw-space-3);
+    }
+}
+
+/* ==========================================================================
    TOUCH DEVICE OPTIMIZATIONS
    ========================================================================== */
 @media (hover: none) and (pointer: coarse) {

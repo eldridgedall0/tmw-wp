@@ -522,6 +522,16 @@
         padding: var(--tmw-space-8) 0;
     }
 
+    /* Reset popular card scale — it overflows on mobile */
+    .tmw-pricing-popular {
+        transform: none;
+        box-shadow: 0 0 24px rgba(56, 189, 248, 0.15);
+    }
+
+    .tmw-pricing-popular:hover {
+        transform: translateY(-4px);
+    }
+
     .tmw-renewal-current-header {
         flex-direction: column;
         align-items: flex-start;
