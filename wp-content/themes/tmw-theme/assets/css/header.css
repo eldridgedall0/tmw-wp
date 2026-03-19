@@ -322,3 +322,53 @@
         display: none;
     }
 }
+
+/* ==========================================================================
+   MOBILE HEADER FIXES (below 1024px)
+   ========================================================================== */
+
+@media (max-width: 1023px) {
+    /* Tighten the gap between logo and actions group */
+    .tmw-header-inner {
+        gap: var(--tmw-space-2);
+    }
+
+    /* Reduce gap between theme toggle / auth nav / hamburger */
+    .tmw-header-actions {
+        gap: var(--tmw-space-1);
+    }
+
+    /* Hide "Go to App" button entirely on mobile — it's already in the mobile menu panel */
+    .tmw-auth-nav-logged-in .tmw-btn-primary {
+        display: none;
+    }
+
+    /* Tighten user menu toggle padding and remove chevron — saves ~40px */
+    .tmw-user-menu-toggle {
+        padding: var(--tmw-space-1);
+        gap: var(--tmw-space-1);
+    }
+
+    .tmw-user-menu-toggle > i.fa-chevron-down {
+        display: none;
+    }
+
+    /* Slightly smaller hit targets so they fit */
+    .tmw-theme-toggle,
+    .tmw-mobile-toggle {
+        width: 36px;
+        height: 36px;
+    }
+}
+
+/* Extra small phones (under 480px) — drop theme toggle entirely */
+@media (max-width: 479px) {
+    .tmw-theme-toggle {
+        display: none;
+    }
+
+    .tmw-header .tmw-container {
+        padding-left: var(--tmw-space-3);
+        padding-right: var(--tmw-space-3);
+    }
+}
