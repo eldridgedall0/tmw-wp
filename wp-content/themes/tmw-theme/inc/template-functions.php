@@ -309,9 +309,6 @@ function tmw_auth_nav() {
             <a href="<?php echo esc_url(tmw_get_page_url('login')); ?>" class="tmw-btn tmw-btn-ghost">
                 <?php _e('Sign In', 'flavor-starter-flavor'); ?>
             </a>
-            <a href="<?php echo esc_url(tmw_get_page_url('register')); ?>" class="tmw-btn tmw-btn-primary">
-                <?php _e('Get Started', 'flavor-starter-flavor'); ?>
-            </a>
         </div>
         <?php
     }
