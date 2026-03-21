@@ -250,7 +250,6 @@
 .tmw-nav-mobile a {
     display: block;
     padding: var(--tmw-space-4);
-    color: var(--tmw-text-secondary);
     font-size: var(--tmw-text-lg);
     font-weight: var(--tmw-font-medium);
     border-radius: var(--tmw-radius);
