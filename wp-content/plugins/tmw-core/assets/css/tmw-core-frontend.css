@@ -1,0 +1,238 @@
+/*
+ * TMW Core — Frontend Styles
+ * Profile page trusted devices + login "Stay logged in" checkbox
+ */
+
+/* ============================================================
+   LOGIN PAGE — "Stay logged in on this device"
+   ============================================================ */
+
+.tmw-trusted-device-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    cursor: pointer;
+    line-height: 1.4;
+}
+
+.tmw-trusted-device-label input[type="checkbox"] {
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.tmw-trusted-device-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.tmw-trusted-device-hint {
+    font-size: 0.75rem;
+    color: var(--muted, #9ca3af);
+    font-weight: 400;
+    line-height: 1.3;
+}
+
+/* ============================================================
+   PROFILE — Trusted Devices Section
+   ============================================================ */
+
+.tmw-trusted-devices-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.tmw-device-row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--border, #2d3748);
+    border-radius: 8px;
+    background: var(--surface, #1a2235);
+    transition: border-color 0.15s;
+}
+
+.tmw-device-row.tmw-device-current {
+    border-color: var(--primary, #3b82f6);
+    background: var(--primary-muted, rgba(59,130,246,0.08));
+}
+
+.tmw-device-icon {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    background: var(--surface-raised, #1e2d42);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted, #9ca3af);
+    font-size: 1.1rem;
+}
+
+.tmw-device-current .tmw-device-icon {
+    background: var(--primary-muted, rgba(59,130,246,0.12));
+    color: var(--primary, #3b82f6);
+}
+
+.tmw-device-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.tmw-device-name {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text, #f1f5f9);
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.tmw-device-current-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 12px;
+    background: var(--primary, #3b82f6);
+    color: #fff;
+}
+
+.tmw-device-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.25rem;
+    font-size: 0.76rem;
+    color: var(--muted, #9ca3af);
+}
+
+.tmw-device-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.tmw-device-meta .fas {
+    font-size: 0.7rem;
+    opacity: 0.7;
+}
+
+.tmw-device-actions { flex-shrink: 0; }
+
+/* Danger outline button */
+.tmw-btn-danger-outline {
+    background: transparent;
+    border: 1px solid var(--danger, #ef4444);
+    color: var(--danger, #ef4444);
+    padding: 0.35rem 0.75rem;
+    font-size: 0.8rem;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    transition: background 0.15s, color 0.15s;
+    font-weight: 500;
+}
+
+.tmw-btn-danger-outline:hover {
+    background: var(--danger, #ef4444);
+    color: #fff;
+}
+
+.tmw-btn-sm { padding: 0.25rem 0.6rem; font-size: 0.75rem; }
+
+/* Trust this device area */
+.tmw-trust-this-device {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border, #2d3748);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.tmw-trust-hint {
+    color: var(--muted, #9ca3af);
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+/* Revoke all */
+.tmw-revoke-all-wrap {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--border, #2d3748);
+    text-align: right;
+}
+
+/* Empty state */
+.tmw-trusted-devices-empty {
+    color: var(--muted, #9ca3af);
+    font-size: 0.875rem;
+    padding: 0.5rem 0;
+    margin: 0;
+}
+
+/* ============================================================
+   PROFILE — Login History Table
+   ============================================================ */
+
+.tmw-login-history-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+.tmw-login-history-table th {
+    text-align: left;
+    padding: 0.5rem 0.75rem;
+    color: var(--muted, #9ca3af);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border, #2d3748);
+}
+
+.tmw-login-history-table td {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 1px solid var(--border-subtle, #1e2d3d);
+    color: var(--text, #f1f5f9);
+    vertical-align: middle;
+}
+
+.tmw-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.tmw-status-success { background: rgba(34,197,94,0.15);  color: #22c55e; }
+.tmw-status-failed  { background: rgba(239,68,68,0.12);  color: #ef4444; }
+
+/* Loading state */
+.tmw-btn-loading { opacity: 0.6; pointer-events: none; cursor: not-allowed; }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 600px) {
+    .tmw-device-row       { flex-wrap: wrap; }
+    .tmw-device-actions   { width: 100%; text-align: right; }
+    .tmw-trust-this-device { flex-direction: column; align-items: flex-start; }
+}
