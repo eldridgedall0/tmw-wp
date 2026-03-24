@@ -2,8 +2,9 @@
 /**
  * TMW Core — Login History
  *
- * Records every login success and failure. Profile page shows the last 5 entries.
- * Full log is available in WP Admin → TMW Core → Login History.
+ * Records login successes and failures to wp_tmw_login_history.
+ * Data is stored silently in the background only — no admin UI,
+ * no profile display. Available for future use or external queries.
  *
  * @package tmw-core
  */
@@ -19,7 +20,6 @@ class TMW_Login_History {
     public static function init() {
         add_action( 'wp_login',        array( __CLASS__, 'record_success' ), 10, 2 );
         add_action( 'wp_login_failed', array( __CLASS__, 'record_failure' ), 10, 1 );
-        add_action( 'tmw_profile_sections', array( __CLASS__, 'render_profile_section' ) );
     }
 
     // =========================================================================
@@ -43,7 +43,7 @@ class TMW_Login_History {
     }
 
     // =========================================================================
-    // QUERIES
+    // QUERY — available for future use
     // =========================================================================
 
     public static function get_for_user( $user_id, $limit = 10 ) {
@@ -58,59 +58,6 @@ class TMW_Login_History {
                 $limit
             )
         );
-    }
-
-    // =========================================================================
-    // PROFILE SECTION
-    // =========================================================================
-
-    public static function render_profile_section( $user ) {
-        $recent = self::get_for_user( $user->ID, 5 );
-        if ( empty( $recent ) ) {
-            return;
-        }
-        ?>
-        <div class="tmw-profile-section" id="tmw-login-history-section">
-            <h2 class="tmw-profile-section-title">
-                <i class="fas fa-history"></i>
-                <?php esc_html_e( 'Recent Login Activity', 'tmw-core' ); ?>
-            </h2>
-            <div class="tmw-card">
-                <div class="tmw-card-body">
-                    <table class="tmw-login-history-table">
-                        <thead>
-                            <tr>
-                                <th><?php esc_html_e( 'Date', 'tmw-core' ); ?></th>
-                                <th><?php esc_html_e( 'Device', 'tmw-core' ); ?></th>
-                                <th><?php esc_html_e( 'IP Address', 'tmw-core' ); ?></th>
-                                <th><?php esc_html_e( 'Status', 'tmw-core' ); ?></th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                        <?php foreach ( $recent as $row ) : ?>
-                            <tr>
-                                <td><?php echo esc_html( date_i18n( get_option('date_format') . ' ' . get_option('time_format'), strtotime( $row->created_at ) ) ); ?></td>
-                                <td><?php echo esc_html( $row->device_info ?: __( 'Unknown', 'tmw-core' ) ); ?></td>
-                                <td><?php echo esc_html( $row->ip_address ); ?></td>
-                                <td>
-                                    <?php if ( $row->event === 'login_success' ) : ?>
-                                        <span class="tmw-status-badge tmw-status-success">
-                                            <i class="fas fa-check"></i> <?php esc_html_e( 'Success', 'tmw-core' ); ?>
-                                        </span>
-                                    <?php else : ?>
-                                        <span class="tmw-status-badge tmw-status-failed">
-                                            <i class="fas fa-times"></i> <?php esc_html_e( 'Failed', 'tmw-core' ); ?>
-                                        </span>
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <?php
     }
 
     // =========================================================================

@@ -4,15 +4,16 @@
  *
  * Frontend endpoints (logged-in users):
  *   tmw_core_trust_device         — trust current device from profile page
- *   tmw_core_revoke_device         — revoke a specific device
- *   tmw_core_revoke_all_devices    — revoke all of the user's devices
- *
- * Admin endpoints:
- *   tmw_core_admin_revoke_device   — admin: revoke any device by ID
+ *   tmw_core_revoke_device        — revoke a specific device
+ *   tmw_core_revoke_all_devices   — revoke all of the user's devices
  *
  * Login integration:
- *   Hooks into wp_login action (which fires inside the theme's tmw_ajax_login
- *   handler) to process the trust_device flag from the login form POST.
+ *   The theme's forms.js uses the native fetch() API (NOT jQuery $.ajax).
+ *   We cannot intercept fetch() from a jQuery patch.  Instead we hook
+ *   directly into wp_login which fires from inside the theme's
+ *   tmw_ajax_login AJAX handler after wp_set_current_user() is called.
+ *   $_POST still contains the original FormData payload at that point,
+ *   including trust_device if the checkbox was ticked.
  *
  * @package tmw-core
  */
@@ -29,10 +30,7 @@ class TMW_Core_Ajax {
         add_action( 'wp_ajax_tmw_core_revoke_device',      array( __CLASS__, 'revoke_device' ) );
         add_action( 'wp_ajax_tmw_core_revoke_all_devices', array( __CLASS__, 'revoke_all_devices' ) );
 
-        // Admin
-        add_action( 'wp_ajax_tmw_core_admin_revoke_device', array( __CLASS__, 'admin_revoke_device' ) );
-
-        // Intercept theme login to process trust_device checkbox
+        // Hook into wp_login — fires inside the theme's tmw_ajax_login handler
         add_action( 'wp_login', array( __CLASS__, 'handle_trust_on_login' ), 10, 2 );
 
         // Enqueue frontend assets on login + profile pages
@@ -40,7 +38,7 @@ class TMW_Core_Ajax {
     }
 
     // =========================================================================
-    // TRUST CURRENT DEVICE (profile page)
+    // TRUST CURRENT DEVICE (profile page button)
     // =========================================================================
 
     public static function trust_device() {
@@ -58,7 +56,7 @@ class TMW_Core_Ajax {
     }
 
     // =========================================================================
-    // REVOKE A DEVICE (user's own)
+    // REVOKE A DEVICE
     // =========================================================================
 
     public static function revoke_device() {
@@ -69,7 +67,6 @@ class TMW_Core_Ajax {
         }
 
         $device_id = (int) ( $_POST['device_id'] ?? 0 );
-
         if ( ! $device_id ) {
             wp_send_json_error( array( 'message' => __( 'Invalid device ID.', 'tmw-core' ) ) );
         }
@@ -82,7 +79,7 @@ class TMW_Core_Ajax {
     }
 
     // =========================================================================
-    // REVOKE ALL DEVICES (user)
+    // REVOKE ALL DEVICES
     // =========================================================================
 
     public static function revoke_all_devices() {
@@ -97,37 +94,15 @@ class TMW_Core_Ajax {
     }
 
     // =========================================================================
-    // ADMIN: REVOKE ANY DEVICE
-    // =========================================================================
-
-    public static function admin_revoke_device() {
-        check_ajax_referer( 'tmw_core_admin_nonce', 'nonce' );
-
-        if ( ! current_user_can( 'manage_options' ) ) {
-            wp_send_json_error( array( 'message' => __( 'Unauthorized.', 'tmw-core' ) ) );
-        }
-
-        $device_id = (int) ( $_POST['device_id'] ?? 0 );
-        $user_id   = (int) ( $_POST['user_id']   ?? 0 );
-
-        if ( ! $device_id || ! $user_id ) {
-            wp_send_json_error( array( 'message' => __( 'Invalid parameters.', 'tmw-core' ) ) );
-        }
-
-        if ( TMW_Trusted_Devices::revoke_device( $device_id, $user_id ) ) {
-            wp_send_json_success( array( 'message' => __( 'Device revoked.', 'tmw-core' ) ) );
-        } else {
-            wp_send_json_error( array( 'message' => __( 'Device not found.', 'tmw-core' ) ) );
-        }
-    }
-
-    // =========================================================================
     // INTERCEPT LOGIN — process trust_device flag
     // =========================================================================
 
     /**
-     * Fires via wp_login action inside the theme's tmw_ajax_login handler.
-     * If the user checked "Stay logged in on this device", we trust the device now.
+     * The theme's forms.js submits via native fetch() with a FormData body.
+     * PHP populates $_POST from the FormData fields normally.
+     * The trust_device checkbox has value="1" and is only included in
+     * FormData when checked — so isset($_POST['trust_device']) is the
+     * correct check, not comparing to the string 'true'.
      *
      * @param string  $user_login
      * @param WP_User $user
@@ -137,10 +112,8 @@ class TMW_Core_Ajax {
             return;
         }
 
-        // The theme's JS sends trust_device=true (string)
-        $trust = ! empty( $_POST['trust_device'] ) && $_POST['trust_device'] === 'true';
-
-        if ( $trust ) {
+        // Checkbox value="1", present in POST only when checked
+        if ( ! empty( $_POST['trust_device'] ) ) {
             TMW_Trusted_Devices::trust_current_device( $user->ID );
         }
     }
