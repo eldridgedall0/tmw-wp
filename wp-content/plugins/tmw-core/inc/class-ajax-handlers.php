@@ -3,17 +3,20 @@
  * TMW Core — AJAX Handlers
  *
  * Frontend endpoints (logged-in users):
- *   tmw_core_trust_device         — trust current device from profile page
+ *   tmw_core_trust_device         — trust current device from profile page button
  *   tmw_core_revoke_device        — revoke a specific device
  *   tmw_core_revoke_all_devices   — revoke all of the user's devices
  *
- * Login integration:
- *   The theme's forms.js uses the native fetch() API (NOT jQuery $.ajax).
- *   We cannot intercept fetch() from a jQuery patch.  Instead we hook
- *   directly into wp_login which fires from inside the theme's
- *   tmw_ajax_login AJAX handler after wp_set_current_user() is called.
- *   $_POST still contains the original FormData payload at that point,
- *   including trust_device if the checkbox was ticked.
+ * Login integration — WHY wp_set_current_user, not wp_login:
+ *   The theme's tmw_ajax_login handler calls wp_set_auth_cookie() and
+ *   wp_set_current_user() but never fires do_action('wp_login').
+ *   It then immediately calls wp_send_json_success() which exits.
+ *   Hooking wp_login therefore never works for this login path.
+ *
+ *   wp_set_current_user() fires the 'set_current_user' action before it
+ *   returns.  At that point $_POST is still fully intact, so we read
+ *   trust_device there.  We guard against running more than once per
+ *   request using a static flag.
  *
  * @package tmw-core
  */
@@ -25,20 +28,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 class TMW_Core_Ajax {
 
     public static function init() {
-        // Frontend (logged-in)
+        // Frontend (logged-in users)
         add_action( 'wp_ajax_tmw_core_trust_device',       array( __CLASS__, 'trust_device' ) );
         add_action( 'wp_ajax_tmw_core_revoke_device',      array( __CLASS__, 'revoke_device' ) );
         add_action( 'wp_ajax_tmw_core_revoke_all_devices', array( __CLASS__, 'revoke_all_devices' ) );
 
-        // Hook into wp_login — fires inside the theme's tmw_ajax_login handler
-        add_action( 'wp_login', array( __CLASS__, 'handle_trust_on_login' ), 10, 2 );
+        // Intercept the login — fires inside wp_set_current_user()
+        // which the theme calls from tmw_ajax_login before exiting
+        add_action( 'set_current_user', array( __CLASS__, 'handle_trust_on_login' ) );
 
-        // Enqueue frontend assets on login + profile pages
+        // Enqueue frontend assets
         add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_frontend_assets' ) );
     }
 
     // =========================================================================
-    // TRUST CURRENT DEVICE (profile page button)
+    // TRUST CURRENT DEVICE (profile page "Trust This Device" button)
     // =========================================================================
 
     public static function trust_device() {
@@ -94,37 +98,66 @@ class TMW_Core_Ajax {
     }
 
     // =========================================================================
-    // INTERCEPT LOGIN — process trust_device flag
+    // INTERCEPT LOGIN — hook: set_current_user
     // =========================================================================
 
     /**
-     * The theme's forms.js submits via native fetch() with a FormData body.
-     * PHP populates $_POST from the FormData fields normally.
-     * The trust_device checkbox has value="1" and is only included in
-     * FormData when checked — so isset($_POST['trust_device']) is the
-     * correct check, not comparing to the string 'true'.
+     * Fires every time wp_set_current_user() is called, including from inside
+     * the theme's tmw_ajax_login AJAX handler.
      *
-     * @param string  $user_login
-     * @param WP_User $user
+     * Guards:
+     *  - Only runs during AJAX requests
+     *  - Only runs when trust_device is set in POST
+     *  - Only runs once per request (static $done flag)
+     *  - Only runs when the user being set is actually authenticated
+     *    (user_id > 0), not when WordPress resets to guest (user_id = 0)
+     *  - Checks that we are handling the tmw_login action specifically
      */
-    public static function handle_trust_on_login( $user_login, $user ) {
+    public static function handle_trust_on_login() {
+        static $done = false;
+        if ( $done ) {
+            return;
+        }
+
+        // Must be an AJAX request for the tmw_login action
         if ( ! wp_doing_ajax() ) {
             return;
         }
 
-        // Checkbox value="1", present in POST only when checked
-        if ( ! empty( $_POST['trust_device'] ) ) {
-            TMW_Trusted_Devices::trust_current_device( $user->ID );
+        $action = isset( $_POST['action'] ) ? sanitize_key( $_POST['action'] ) : '';
+        if ( $action !== 'tmw_login' ) {
+            return;
         }
+
+        // trust_device checkbox: value="1", only present in POST when checked
+        if ( empty( $_POST['trust_device'] ) ) {
+            return;
+        }
+
+        // get_current_user_id() reflects the user just set by wp_set_current_user()
+        $user_id = get_current_user_id();
+        if ( $user_id < 1 ) {
+            return;
+        }
+
+        $done = true;
+        TMW_Trusted_Devices::trust_current_device( $user_id );
     }
 
     // =========================================================================
     // FRONTEND ASSETS
     // =========================================================================
 
+    /**
+     * Enqueue CSS + JS on login and profile page templates.
+     *
+     * Uses a multi-condition check to cover both the case where
+     * is_page_template() resolves with a relative path (the normal case when
+     * the template lives in the theme) and an absolute-path match as fallback.
+     */
     public static function enqueue_frontend_assets() {
-        $on_profile = is_page_template( 'templates/template-profile.php' );
-        $on_login   = is_page_template( 'templates/template-login.php' );
+        $on_profile = self::is_template( 'template-profile.php' );
+        $on_login   = self::is_template( 'template-login.php' );
 
         if ( ! $on_profile && ! $on_login ) {
             return;
@@ -145,6 +178,7 @@ class TMW_Core_Ajax {
             true
         );
 
+        // Use wp_localize_script — the safest cross-version way to pass data
         wp_localize_script( 'tmw-core-frontend', 'tmwCore', array(
             'ajaxurl' => admin_url( 'admin-ajax.php' ),
             'nonce'   => wp_create_nonce( 'tmw_core_nonce' ),
@@ -157,5 +191,28 @@ class TMW_Core_Ajax {
                 'error'            => __( 'Something went wrong. Please try again.', 'tmw-core' ),
             ),
         ) );
+    }
+
+    /**
+     * Robust template check that works regardless of whether the template
+     * is stored in the theme root, a subdirectory, or resolved as an
+     * absolute path by WordPress.
+     *
+     * @param string $template_filename  e.g. 'template-profile.php'
+     * @return bool
+     */
+    private static function is_template( $template_filename ) {
+        // Standard check with relative path used by this theme
+        if ( is_page_template( 'templates/' . $template_filename ) ) {
+            return true;
+        }
+
+        // Fallback: compare basename of whatever template WP resolved
+        $current = get_page_template_slug();
+        if ( $current && basename( $current ) === $template_filename ) {
+            return true;
+        }
+
+        return false;
     }
 }
